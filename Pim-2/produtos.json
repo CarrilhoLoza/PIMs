@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "nome": "Arroz Branco Tipo 1",
+    "descricao": "Arroz branco 5kg, excelente qualidade",
+    "categoria": "Alimento",
+    "peso": 5.0,
+    "data_validade": "15/08/2025",
+    "quantidade": 120,
+    "quantidade_minima": 10,
+    "doador_id": 7,
+    "doador_nome": "Supermercado Preço Bom",
+    "data_cadastro": "10/02/2025 08:30",
+    "status": "Disponível",
+    "ativo": true
+  },
+  {
+    "id": 2,
+    "nome": "Feijão Carioca",
+    "descricao": "Feijão carioca 1kg",
+    "categoria": "Alimento",
+    "peso": 1.0,
+    "data_validade": "20/10/2025",
+    "quantidade": 85,
+    "quantidade_minima": 15,
+    "doador_id": 8,
+    "doador_nome": "Distribuidora Alimentícia",
+    "data_cadastro": "12/02/2025 09:15",
+    "status": "Disponível",
+    "ativo": true
+  },
+  {
+    "id": 3,
+    "nome": "Leite em Pó Integral",
+    "descricao": "Leite em pó 400g, enriquecido com vitaminas",
+    "categoria": "Alimento",
+    "peso": 0.4,
+    "data_validade": "30/06/2025",
+    "quantidade": 45,
+    "quantidade_minima": 8,
+    "doador_id": 7,
+    "doador_nome": "Supermercado Preço Bom",
+    "data_cadastro": "15/02/2025 14:20",
+    "status": "Disponível",
+    "ativo": true
+  },
+  {
+    "id": 4,
+    "nome": "Óleo de Soja",
+    "descricao": "Óleo de soja 900ml",
+    "categoria": "Alimento",
+    "peso": 0.9,
+    "data_validade": "25/09/2025",
+    "quantidade": 60,
+    "quantidade_minima": 12,
+    "doador_id": 8,
+    "doador_nome": "Distribuidora Alimentícia",
+    "data_cadastro": "18/02/2025 11:00",
+    "status": "Disponível",
+    "ativo": true
+  }
+]

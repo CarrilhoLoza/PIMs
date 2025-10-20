@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "tipo": "SAIDA",
+    "produto_id": 1,
+    "produto_nome": "Arroz Branco Tipo 1",
+    "quantidade": 5,
+    "usuario_id": 9,
+    "usuario_nome": "Ana Cristina Pereira",
+    "data_solicitacao": "15/02/2025 10:00",
+    "status": "Pendente"
+  },
+  {
+    "id": 2,
+    "tipo": "SAIDA",
+    "produto_id": 1,
+    "produto_nome": "Arroz Branco Tipo 1",
+    "quantidade": 1,
+    "usuario_id": 9,
+    "usuario_nome": "Ana Cristina Pereira",
+    "data_solicitacao": "13/10/2025 17:03",
+    "status": "Pendente"
+  },
+  {
+    "id": 3,
+    "tipo": "ENTRADA",
+    "produto_nome": "teste",
+    "produto_descricao": "teste",
+    "produto_categoria": "teste",
+    "produto_peso": 10.0,
+    "produto_validade": "20/12/2025",
+    "quantidade": 10,
+    "usuario_id": 8,
+    "usuario_nome": "Distribuidora Alimentícia",
+    "data_solicitacao": "17/10/2025 20:10",
+    "status": "Reprovada",
+    "data_processamento": "17/10/2025 21:19",
+    "processado_por": "Administrador"
+  },
+  {
+    "id": 4,
+    "tipo": "ENTRADA",
+    "produto_nome": "teste",
+    "produto_descricao": "teste",
+    "produto_categoria": "teste",
+    "produto_peso": 10.0,
+    "produto_validade": "12/12/25",
+    "quantidade": 10,
+    "usuario_id": 8,
+    "usuario_nome": "Distribuidora Alimentícia",
+    "data_solicitacao": "17/10/2025 20:14",
+    "status": "Aprovada",
+    "data_processamento": "17/10/2025 21:19",
+    "processado_por": "Administrador"
+  },
+  {
+    "id": 5,
+    "tipo": "SAIDA",
+    "produto_id": 5,
+    "produto_nome": "teste",
+    "quantidade": 5,
+    "usuario_id": 10,
+    "usuario_nome": "José Carlos da Silva",
+    "data_solicitacao": "17/10/2025 21:21",
+    "status": "Aprovada",
+    "data_processamento": "17/10/2025 21:25",
+    "processado_por": "JUAN OLIVEIRA MARQUES"
+  },
+  {
+    "id": 6,
+    "tipo": "SAIDA",
+    "produto_id": 5,
+    "produto_nome": "teste",
+    "quantidade": 5,
+    "usuario_id": 10,
+    "usuario_nome": "José Carlos da Silva",
+    "data_solicitacao": "17/10/2025 21:23",
+    "status": "Reprovada",
+    "data_processamento": "17/10/2025 21:25",
+    "processado_por": "JUAN OLIVEIRA MARQUES"
+  }
+]

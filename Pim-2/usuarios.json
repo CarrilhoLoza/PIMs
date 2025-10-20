@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "nome": "Administrador",
+    "email": "admin@sistema.com",
+    "senha": "123456",
+    "perfil": "Administrador",
+    "cpf": "12345678901",
+    "telefone": "(11) 99999-0001",
+    "data_cadastro": "01/01/2024 00:00"
+  },
+  {
+    "id": 2,
+    "nome": "João Victor Carrilho Loza",
+    "email": "joao.victor@sistema.com",
+    "senha": "123456",
+    "perfil": "Administrador",
+    "cpf": "12345678902",
+    "telefone": "(11) 99999-1001",
+    "data_cadastro": "15/01/2024 09:00"
+  },
+  {
+    "id": 3,
+    "nome": "Jonathan Thalles de Albuquerque",
+    "email": "jonathan.thales@sistema.com",
+    "senha": "123456",
+    "perfil": "Administrador",
+    "cpf": "12345678903",
+    "telefone": "(11) 99999-1002",
+    "data_cadastro": "15/01/2024 09:00"
+  },
+  {
+    "id": 4,
+    "nome": "Juan Oliveira Marques",
+    "email": "juan.marques@sistema.com",
+    "senha": "123456",
+    "perfil": "Administrador",
+    "cpf": "12345678904",
+    "telefone": "(11) 99999-1003",
+    "data_cadastro": "20/01/2024 14:30"
+  },
+  {
+    "id": 5,
+    "nome": "Vinicius de Pádua Fratti Bertonni",
+    "email": "vinicius.bertoni@sistema.com",
+    "senha": "123456",
+    "perfil": "Administrador",
+    "cpf": "12345678905",
+    "telefone": "(11) 99999-1004",
+    "data_cadastro": "20/01/2024 14:30"
+  },
+  {
+    "id": 6,
+    "nome": "Vitor Henrique Godim Matias",
+    "email": "vitor.matias@sistema.com",
+    "senha": "123456",
+    "perfil": "Administrador",
+    "cpf": "12345678906",
+    "telefone": "(11) 99999-1005",
+    "data_cadastro": "25/01/2024 10:15"
+  },
+  {
+    "id": 7,
+    "nome": "Supermercado Preço Bom",
+    "email": "doacoes@precobom.com.br",
+    "senha": "123456",
+    "perfil": "Doador",
+    "cpf": "12345678907",
+    "telefone": "(11) 3333-1000",
+    "data_cadastro": "10/02/2025 08:30"
+  },
+  {
+    "id": 8,
+    "nome": "Distribuidora Alimentícia",
+    "email": "distribuidora.almt@outlook.com.br",
+    "senha": "123456",
+    "perfil": "Doador",
+    "cpf": "12345678908",
+    "telefone": "(11) 4444-2000",
+    "data_cadastro": "12/02/2025 09:15"
+  },
+  {
+    "id": 9,
+    "nome": "Ana Cristina Pereira",
+    "email": "ana.pereira@email.com",
+    "senha": "123456",
+    "perfil": "Solicitante",
+    "cpf": "11122233344",
+    "telefone": "(11) 95555-1111",
+    "data_cadastro": "10/02/2025 09:00"
+  },
+  {
+    "id": 10,
+    "nome": "José Carlos da Silva",
+    "email": "jose.silva@email.com",
+    "senha": "123456",
+    "perfil": "Solicitante",
+    "cpf": "22233344455",
+    "telefone": "(11) 94444-2222",
+    "data_cadastro": "12/02/2025 10:30"
+  },
+  {
+    "id": 11,
+    "nome": "Teste Da Silva",
+    "email": "teste.atualizado@gmail.com",
+    "senha": "123456",
+    "perfil": "Solicitante",
+    "cpf": "222.333.444-55",
+    "telefone": "(11) 12345-6789",
+    "data_cadastro": "12/02/2025 10:30"
+  }
+]
