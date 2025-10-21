@@ -148,18 +148,44 @@ def login():
                 return False #retorna a função
 
 def limpar_telefone(telefone):
-    """LIMPA FORMATAÇÃO DO TELEFONE"""
+    """Limpa formatação do telefone, mantendo apenas dígitos"""
     if not telefone:
         return ""
-    return ''.join(filter(str.isdigit, telefone)) #filtra apenas caracteres digitos
+    return ''.join(filter(str.isdigit, str(telefone)))
 
-def formatando_cpf(cpf: str) -> str:
-    """FORMATA CPF PARA PADRÃO BRASILEIRO"""
-    cpf_limpo = ''.join(filter(str.isdigit, cpf))
-    if len(cpf_limpo) != 11:
-        return cpf
-    
-    return f"{cpf_limpo[:3]}.{cpf_limpo[3:6]}.{cpf_limpo[6:9]}-{cpf_limpo[9:]}"
+def validar_formatar_cpf(cpf: str):
+    """
+    Valida CPF (com dígitos verificadores) e retorna formatado.
+    Retorna:
+        (cpf_formatado, True)  -> se válido
+        (mensagem_erro, False) -> se inválido
+    """
+    # Remove pontuação
+    cpf_limpo = cpf.strip().replace(".", "").replace("-", "")
+
+    # Checagens básicas
+    if not cpf_limpo.isdigit() or len(cpf_limpo) != 11:
+        return ("❌ CPF deve conter exatamente 11 números.", False)
+    if cpf_limpo == cpf_limpo[0] * 11:
+        return ("❌ CPF inválido: todos os dígitos iguais.", False)
+
+    ## para conseguir utilizar cpf ficticio para exemplo o codigo de validação abaixo está "desativado"
+    '''
+    # Cálculo do 1º dígito verificador
+    soma = sum(int(cpf_limpo[i]) * (10 - i) for i in range(9))
+    digito1 = (soma * 10 % 11) % 10
+
+    # Cálculo do 2º dígito verificador
+    soma = sum(int(cpf_limpo[i]) * (11 - i) for i in range(10))
+    digito2 = (soma * 10 % 11) % 10
+
+    if cpf_limpo[-2:] != f"{digito1}{digito2}":
+        return ("❌ CPF inválido! Dígitos verificadores não conferem.", False)'''
+
+    # Formata CPF no padrão XXX.XXX.XXX-XX
+    cpf_formatado = f"{cpf_limpo[:3]}.{cpf_limpo[3:6]}.{cpf_limpo[6:9]}-{cpf_limpo[9:]}"
+    return (cpf_formatado, True)
+
 
 def gerar_senha_temporaria(tamanho = 8):
     """GERA SENHA TEMPORÁRIA ALEATÓRIA"""
@@ -190,7 +216,7 @@ def recuperar_senha():
     telefone = input("📞 Telefone com DDD: ").strip()
     nome_completo = input("👤 Nome completo: ").strip().title()
     
-    usuario = next((u for u in usuarios if u['email'].lower() == email), None)#encontra usuario com email
+    usuario = next((u for u in usuarios if u['email'] == email), None)#encontra usuario com email
     
     if not usuario: #verifica se usuario não existe no sistema
         print(f"\n❌ E-mail não encontrado no sistema.")
@@ -201,19 +227,27 @@ def recuperar_senha():
     verificacao_ok = True
     mensagens_erro = []
     
-    if usuario['nome'].title() != nome_completo: #checa nomes
+    if usuario['nome'] != nome_completo: #checa nomes
         verificacao_ok = False
         mensagens_erro.append("❌ Nome completo não confere")
     
-    cpf_input = formatando_cpf(cpf) #limpa cpf da entrada atual
+    resultado, valido = validar_formatar_cpf(cpf)
+
+    if valido:
+        cpf = resultado  # aqui sim pegamos o CPF formatado
+    else:
+        print(resultado)  # mostra mensagem de erro
+        pausar()
+        return  #pede para digitar novamente
     
-    if usuario.get('cpf', '')  != cpf_input:    #checa cpf
+    if usuario['cpf']  != cpf:    #checa cpf
         verificacao_ok = False
         mensagens_erro.append("❌ CPF não confere")
     
-    telefone_limpo = limpar_telefone(telefone)  #limpa telefone da entrada atual
-    
-    if usuario.get('telefone', '') != telefone_limpo:
+    telefone_input = limpar_telefone(telefone)  #limpa telefone da entrada atual
+    telefone_armazenado = limpar_telefone(usuario['telefone'])  #limpa telefone armazenado
+
+    if telefone_armazenado != telefone_input:
         verificacao_ok = False
         mensagens_erro.append("❌ Telefone não confere")
     
@@ -222,7 +256,7 @@ def recuperar_senha():
         usuario_original = next((u for u in usuarios if u['id'] == usuario['id']), None) 
         # encontra usuario pelo id ou retorna "None" se não encontar 👆👆
 
-        if usuario_original:        #se encontarr ussuario
+        if usuario_original:        #se encontar ussuario
             usuario_original['senha'] = senha_temporaria  #reseta senha
             salvar_dados()      #salva alteração
 
@@ -233,18 +267,17 @@ def recuperar_senha():
             print("   1. Faça login com esta senha temporária")
             print("   2. Vá em 'Meu Perfil' para redefinir sua senha")
             print("   3. Escolha uma senha segura e fácil de lembrar")
-            print(f"\n⚠️  Esta senha é válida por 24 horas")
             
         else:
             print(f"\n❌ Erro interno ao atualizar senha.")
-    
+        pausar() 
     else:       #se infrmação não forem coincidentes com armazenadas
         print(f"\n❌ Falha na verificação de identidade.")
         print("   Erros encontrados:")
         for erro in mensagens_erro: #informa erros 
             print(f"   - {erro}")
         print(f"\nVerifique os dados informados e tente novamente.")
-    
+        pausar()
     pausar()
 
 def alterar_senha():
@@ -313,6 +346,41 @@ def cadastrar_usuario():
         if  not info:
             print("❌ Por favor, preencha todos os campos!")
             return
+    
+    #verifica se email tem estrutura valida
+    if email.count("@") != 1:   #verifica existencia necessaria de @
+        print("❌ O e-mail deve conter apenas um '@'.")
+        return
+    if " " in email:    #verifica se email tem espaços
+        print("❌ O e-mail não pode conter espaços.")
+        return
+    
+    nome, dominio = email.split("@", 1)# divide nome do dominio para analisar em partes
+
+    if not nome: #verifica se email tem nome
+        print("❌ O e-mail precisa ter algo antes do '@'")
+        return 
+    if not dominio: #verifica se email tem dominio
+        print("❌ O e-mail precisa ter algo depois do '@'")
+        return 
+    if "." not in dominio: #verifica se email contem "." no dominio
+        print("❌ O domínio deve conter pelo menos um ponto")
+        return 
+    if dominio.startswith("."): #verifica se dominio começa com "."
+        print("❌ O domínio não pode começar com um ponto")
+        return 
+    if dominio.endswith("."): #verifica se dominio termina com "."
+        print("❌ O domínio não pode terminar com um ponto")
+        return 
+
+    # Verifica se CPF é valido e já formata
+    resultado, valido = validar_formatar_cpf(cpf)
+    # resultado ou é o cpf ou é uma mensagem erro
+    if valido:
+        cpf = resultado  # aqui sim pegamos o CPF formatado
+    else:
+        print(resultado)  # mostra mensagem de erro
+        return  #pede para digitar novamente
 
     # Menu de seleção de perfil por número
     print("\n🎭 Selecione o perfil do usuário:")
@@ -406,8 +474,7 @@ def exibir_meus_dados():
     print(f"👤 Nome: {usuario['nome']}")
     print(f"📧 E-mail: {usuario['email']}")
     print(f"🎭 Perfil: {usuario['perfil']}")    
-    cpf_formatado = formatando_cpf(usuario['cpf'])
-    print(f"📄 CPF: {cpf_formatado}")
+    print(f"📄 CPF: {usuario['cpf']}")
     print(f"📞 Telefone: {usuario['telefone']}")
     print(f"📅 Data de Cadastro: {usuario['data_cadastro']}")
 
@@ -471,11 +538,36 @@ def atualizar_dados():
             pausar()
             return
         
-        # Verifica formato básico do e-mail
-        if '@' not in novo_email or '.' not in novo_email:
-            print("❌ Por favor, digite um e-mail válido!")
-            pausar()
+            #verifica se email tem estrutura valida
+        if novo_email.count("@") != 1:   #verifica existencia necessaria de @
+            print("❌ O e-mail deve conter apenas um '@'.")
             return
+        if " " in novo_email:    #verifica se email tem espaços
+            print("❌ O e-mail não pode conter espaços.")
+            return
+        
+        nome, dominio = novo_email.split("@", 1)# divide nome do dominio para analisar em partes
+
+        if not nome: #verifica se email tem nome
+            print("❌ O e-mail precisa ter algo antes do '@'")
+            pausar()
+            return 
+        if not dominio: #verifica se email tem dominio
+            print("❌ O e-mail precisa ter algo depois do '@'")
+            pausar()
+            return 
+        if "." not in dominio: #verifica se email contem "." no dominio
+            print("❌ O domínio deve conter pelo menos um ponto")
+            pausar()
+            return 
+        if dominio.startswith("."): #verifica se dominio começa com "."
+            print("❌ O domínio não pode começar com um ponto")
+            pausar()
+            return 
+        if dominio.endswith("."): #verifica se dominio termina com "."
+            print("❌ O domínio não pode terminar com um ponto")
+            pausar()
+            return 
             
         usuario['email'] = novo_email
         alteracoes = True
