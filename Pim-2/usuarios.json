@@ -5,7 +5,7 @@
     "email": "admin@sistema.com",
     "senha": "123456",
     "perfil": "Administrador",
-    "cpf": "12345678901",
+    "cpf": "123.456.789-01",
     "telefone": "(11) 99999-0001",
     "data_cadastro": "01/01/2024 00:00"
   },
@@ -15,7 +15,7 @@
     "email": "joao.victor@sistema.com",
     "senha": "123456",
     "perfil": "Administrador",
-    "cpf": "12345678902",
+    "cpf": "123.456.789-02",
     "telefone": "(11) 99999-1001",
     "data_cadastro": "15/01/2024 09:00"
   },
@@ -25,7 +25,7 @@
     "email": "jonathan.thales@sistema.com",
     "senha": "123456",
     "perfil": "Administrador",
-    "cpf": "12345678903",
+    "cpf": "123.456.789-03",
     "telefone": "(11) 99999-1002",
     "data_cadastro": "15/01/2024 09:00"
   },
@@ -35,7 +35,7 @@
     "email": "juan.marques@sistema.com",
     "senha": "123456",
     "perfil": "Administrador",
-    "cpf": "12345678904",
+    "cpf": "123.456.789-04",
     "telefone": "(11) 99999-1003",
     "data_cadastro": "20/01/2024 14:30"
   },
@@ -45,7 +45,7 @@
     "email": "vinicius.bertoni@sistema.com",
     "senha": "123456",
     "perfil": "Administrador",
-    "cpf": "12345678905",
+    "cpf": "123.456.789-05",
     "telefone": "(11) 99999-1004",
     "data_cadastro": "20/01/2024 14:30"
   },
@@ -55,7 +55,7 @@
     "email": "vitor.matias@sistema.com",
     "senha": "123456",
     "perfil": "Administrador",
-    "cpf": "12345678906",
+    "cpf": "123.456.789-06",
     "telefone": "(11) 99999-1005",
     "data_cadastro": "25/01/2024 10:15"
   },
@@ -65,7 +65,7 @@
     "email": "doacoes@precobom.com.br",
     "senha": "123456",
     "perfil": "Doador",
-    "cpf": "12345678907",
+    "cpf": "123.456.789-07",
     "telefone": "(11) 3333-1000",
     "data_cadastro": "10/02/2025 08:30"
   },
@@ -75,7 +75,7 @@
     "email": "distribuidora.almt@outlook.com.br",
     "senha": "123456",
     "perfil": "Doador",
-    "cpf": "12345678908",
+    "cpf": "123.456.789-08",
     "telefone": "(11) 4444-2000",
     "data_cadastro": "12/02/2025 09:15"
   },
@@ -85,7 +85,7 @@
     "email": "ana.pereira@email.com",
     "senha": "123456",
     "perfil": "Solicitante",
-    "cpf": "11122233344",
+    "cpf": "111.222.333-44",
     "telefone": "(11) 95555-1111",
     "data_cadastro": "10/02/2025 09:00"
   },
@@ -95,7 +95,7 @@
     "email": "jose.silva@email.com",
     "senha": "123456",
     "perfil": "Solicitante",
-    "cpf": "22233344455",
+    "cpf": "222.333.444-55",
     "telefone": "(11) 94444-2222",
     "data_cadastro": "12/02/2025 10:30"
   },
