@@ -1080,11 +1080,52 @@ def verificar_produtos_proximos_vencimento():
     
     return produtos_proximos  #retorna lista de produtos perto do vencimento
 
+def verificar_produtos_vencidos():
+    """VERIFICA PRODUTOS JÁ VENCIDOS"""
+    produtos_vencidos = []
+    hoje = datetime.datetime.now()
+    
+    for produto in produtos:
+        try:
+            data_validade = datetime.datetime.strptime(produto['data_validade'], "%d/%m/%Y")
+            if data_validade < hoje:  # Produtos com data anterior à atual
+                produtos_vencidos.append(produto)
+        except:
+            continue
+    
+    return produtos_vencidos
+
+def remover_produtos_vencidos():
+    """REMOVE PRODUTOS VENCIDOS DO ESTOQUE"""
+    produtos_vencidos = verificar_produtos_vencidos()
+    
+    if not produtos_vencidos:
+        print("✅ Nenhum produto vencido encontrado!")
+        pausar()
+        return
+    
+    print(f"🚨 Encontrados {len(produtos_vencidos)} produtos vencidos:")
+    for produto in produtos_vencidos:
+        print(f"   💀 {produto['nome']} - venceu em {produto['data_validade']} | Estoque: {produto['quantidade']} unidades")
+    
+    confirmar = input("\n🗑️  Deseja remover TODOS os produtos vencidos? (s/n): ").lower()
+    
+    if confirmar == 's':
+        # Remove produtos vencidos da lista
+        global produtos
+        produtos = [p for p in produtos if p not in produtos_vencidos]
+        salvar_dados()
+        print(f"✅ {len(produtos_vencidos)} produtos vencidos removidos com sucesso!")
+    else:
+        print("❌ Operação cancelada.")
+    
+    pausar()
+
 def visualizar_estoque():
     """VISUALIZAR ESTOQUE - Para administradores"""
     exibir_cabecalho("ESTOQUE ATUAL")
     
-    if not produtos: #verifica se não tem produtos em estoque
+    if not produtos:
         print("📭 Nenhum produto no estoque.")
         pausar()
         return
@@ -1092,25 +1133,43 @@ def visualizar_estoque():
     # Alertas
     produtos_baixo_estoque = [p for p in produtos if p['quantidade'] <= p['quantidade_minima']]
     produtos_proximos_vencer = verificar_produtos_proximos_vencimento()
+    produtos_vencidos = verificar_produtos_vencidos()  # NOVO: Verifica produtos vencidos
     
-    if produtos_baixo_estoque:  #se existir produtos abaixo do estoque minimo
+    # 🔴 ALERTA DE PRODUTOS VENCIDOS (NOVO)
+    if produtos_vencidos:
+        print("🚨 PRODUTOS VENCIDOS:")
+        for produto in produtos_vencidos:
+            print(f"   💀 {produto['nome']} - venceu em {produto['data_validade']} | Estoque: {produto['quantidade']} unidades")
+        print()
+    
+    if produtos_baixo_estoque:
         print("⚠️  ALERTAS DE ESTOQUE BAIXO:")
-        for produto in produtos_baixo_estoque:# lista produtos com estoque baixo
+        for produto in produtos_baixo_estoque:
             print(f"   📦 {produto['nome']} - apenas {produto['quantidade']} unidades")
         print()
     
-    if produtos_proximos_vencer:     #se existir produtos perto de vencer
+    if produtos_proximos_vencer:
         print("⚠️  PRODUTOS PRÓXIMOS DO VENCIMENTO:")
-        for produto in produtos_proximos_vencer:    #lista de produtos perto de vencer
+        for produto in produtos_proximos_vencer:
             print(f"   ⏰ {produto['nome']} - vence em {produto['data_validade']}")
         print()
     
-    #cabeçalho da tabela
+    # Resto do código da função permanece igual...
     print(f"{'ID':<4} {'NOME':<20} {'CATEGORIA':<15} {'QUANTIDADE':<12} {'ESTOQUE':<10} {'VALIDADE':<12}")
     print("-" * 90)
     
-    for produto in produtos:    #lista produtos
+    for produto in produtos:
         estoque_status = "🟢 OK" if produto['quantidade'] > produto['quantidade_minima'] else "🔴 BAIXO"
+        
+        # Verifica se o produto está vencido para destacar na tabela
+        try:
+            data_validade = datetime.datetime.strptime(produto['data_validade'], "%d/%m/%Y")
+            hoje = datetime.datetime.now()
+            if data_validade < hoje:
+                estoque_status = "💀 VENCIDO"  # Destaca produtos vencidos na tabela
+        except:
+            pass
+            
         print(f"{produto['id']:<4} {produto['nome'][:18]:<20} {produto['categoria'][:13]:<15} "
               f"{produto['quantidade']:<12} {estoque_status:<10} {produto['data_validade']:<12}")
     
@@ -1515,14 +1574,15 @@ def menu_administrador():
         exibir_cabecalho("MENU PRINCIPAL")
         print(f"👤 Usuário: {usuario_logado['nome']} | Perfil: {usuario_logado['perfil']}")
         print("-" * 40)
-        #   menu simples para escolha
+        
         print("1. ✅ Aprovar/Reprovar Pendências")
         print("2. 📦 Visualizar Estoque")
-        print("3. 📊 Relatórios")
-        print("4. 👥 Gerenciar Usuários")
-        print("5. 👤 Meu Perfil")
-        print("6. 🎭 Trocar de Usuario")    
-        print("7. 🚪 Sair")
+        print("3. 🗑️  Remover Produtos Vencidos")  # NOVA OPÇÃO
+        print("4. 📊 Relatórios")
+        print("5. 👥 Gerenciar Usuários")
+        print("6. 👤 Meu Perfil")
+        print("7. 🎭 Trocar de Usuario")    
+        print("8. 🚪 Sair")
         
         opcao = input("\n📋 Escolha uma opção: ")
         
@@ -1530,16 +1590,18 @@ def menu_administrador():
             menu_aprovar_pendencias()
         elif opcao == '2':
             visualizar_estoque()
-        elif opcao == '3':
-            menu_relatorios()
+        elif opcao == '3':  # NOVA OPÇÃO
+            remover_produtos_vencidos()
         elif opcao == '4':
-            menu_gerenciar_usuarios()
+            menu_relatorios()
         elif opcao == '5':
-            menu_meu_perfil()
+            menu_gerenciar_usuarios()
         elif opcao == '6':
+            menu_meu_perfil()
+        elif opcao == '7':
             if trocar_usuario():
                 return True
-        elif opcao == '7':
+        elif opcao == '8':
             limpar_tela()
             print("\n👋 Até logo!")
             return False            
