@@ -1176,110 +1176,239 @@ def gerar_relatorio_movimentacoes():
         pausar()
         return
     
-    # Filtros de periodos
-    print("📅 Filtrar por período:")
-    print("1. 📊 Últimos 7 dias")
-    print("2. 📈 Últimos 30 dias")
-    print("3. 📋 Todo o histórico")
-    
-    try: #verifica se input 'filtro' é valido
-        filtro = int(input("\n📋 Escolha o período: "))
+    while True:  # Loop principal para permitir múltiplos acessos
+        # Filtros de periodos
+        print("📅 Filtrar por período:")
+        print("1. 📊 Últimos 7 dias")
+        print("2. 📈 Últimos 30 dias")
+        print("3. 📋 Todo o histórico")
+        print("4. 🏠 Voltar ao menu anterior")
         
-        hoje = datetime.datetime.now()
-        movimentacoes_filtradas = []
-        
-        for mov in movimentacoes: # Percorre todas as movimentações para aplicar o filtro
-            try:
-                #coverte string para datetime
-                data_mov = datetime.datetime.strptime(mov['data'], "%d/%m/%Y %H:%M")
-                
-                #aplicação do filtro conforme input "filtro" anteriormente
-                if filtro == 1 and (hoje - data_mov).days <= 7:
-                    movimentacoes_filtradas.append(mov)
-                elif filtro == 2 and (hoje - data_mov).days <= 30:
-                    movimentacoes_filtradas.append(mov)
-                elif filtro == 3:
-                    movimentacoes_filtradas.append(mov)
+        try: #verifica se input 'filtro' é valido
+            filtro = int(input("\n📋 Escolha o período: "))
+            limpar_tela()
+            if filtro == 4:  # Opção para sair
+                return
+            
+            hoje = datetime.datetime.now()
+            movimentacoes_filtradas = []
+            
+            for mov in movimentacoes: # Percorre todas as movimentações para aplicar o filtro
+                try:
+                    #converte string para datetime
+                    data_mov = datetime.datetime.strptime(mov['data'], "%d/%m/%Y %H:%M")
                     
-            except: # Se houver erro na conversão de data, pula para a próxima movimentação
-                continue
-        
-        if not movimentacoes_filtradas: #se nenhuma movimentação no periodo selecionado
-            print("📭 Nenhuma movimentação no período selecionado.")
-            pausar()
-            return
-        
-        # Estatísticas
-        # List comprehension: filtra apenas movimentações do tipo ENTRADA
-        entradas = [m for m in movimentacoes_filtradas if m['tipo'] == 'ENTRADA']
-        saidas = [m for m in movimentacoes_filtradas if m['tipo'] == 'SAIDA']
-        # List comprehension: filtra apenas movimentações do tipo SAIDA 👆
+                    #aplicação do filtro conforme input "filtro" anteriormente
+                    if filtro == 1 and (hoje - data_mov).days <= 7:
+                        movimentacoes_filtradas.append(mov)
+                    elif filtro == 2 and (hoje - data_mov).days <= 30:
+                        movimentacoes_filtradas.append(mov)
+                    elif filtro == 3:
+                        movimentacoes_filtradas.append(mov)
+                        
+                except: # Se houver erro na conversão de data, pula para a próxima movimentação
+                    continue
+            
+            if not movimentacoes_filtradas: #se nenhuma movimentação no periodo selecionado
+                print("📭 Nenhuma movimentação no período selecionado.")
+                pausar()
+                continue  # Volta para o início do loop
+            
+            # Estatísticas
+            # List comprehension: filtra apenas movimentações do tipo ENTRADA
+            entradas = [m for m in movimentacoes_filtradas if m['tipo'] == 'ENTRADA']
+            saidas = [m for m in movimentacoes_filtradas if m['tipo'] == 'SAIDA']
+            # List comprehension: filtra apenas movimentações do tipo SAIDA 👆
 
-        #armazena quantidade totais de cada tipo
-        total_entradas = sum(e['quantidade'] for e in entradas)
-        total_saidas = sum(s['quantidade'] for s in saidas)
-        
-        print(f"\n📊 RESUMO DO PERÍODO:")
-        print(f"   🎁 Entradas (doações): {len(entradas)} registros, {total_entradas} unidades")
-        print(f"   📦 Saídas (solicitações): {len(saidas)} registros, {total_saidas} unidades")
-        print(f"   📈 Saldo líquido: {total_entradas - total_saidas} unidades")
-        print("-" * 90)
-        
-        # Exibe o cabeçalho
-        print(f"\n📋 DETALHES DAS MOVIMENTAÇÕES:")
-        print(f"{'DATA':<16} {'TIPO':<8} {'PRODUTO':<20} {'QUANTIDADE':<12} {'USUÁRIO':<20}")
-        print("-" * 90)
-        
-        for mov in movimentacoes_filtradas: #lista movimentações
-            tipo = "🎁 ENTRADA" if mov['tipo'] == 'ENTRADA' else "📦 SAÍDA"
-            usuario = mov.get('doador_nome', mov.get('solicitante_nome', 'Sistema'))[:18]
-            print(f"{mov['data']:<16} {tipo:<8} {mov['produto_nome'][:18]:<20} {mov['quantidade']:<12} {usuario:<20}")
-        
-    except ValueError:
-        print("❌ Opção inválida!")
-        pausar()
+            #armazena quantidade totais de cada tipo
+            total_entradas = sum(e['quantidade'] for e in entradas)
+            total_saidas = sum(s['quantidade'] for s in saidas)
+            
+            print(f"\n📊 RESUMO DO PERÍODO:")
+            print(f"   🎁 Entradas (doações): {len(entradas)} registros, {total_entradas} unidades")
+            print(f"   📦 Saídas (solicitações): {len(saidas)} registros, {total_saidas} unidades")
+            print(f"   📈 Saldo líquido: {total_entradas - total_saidas} unidades")
+            print("-" * 90)
+            
+            # Exibe o cabeçalho
+            print(f"\n📋 DETALHES DAS MOVIMENTAÇÕES:")
+            print(f"{'DATA':<16} {'TIPO':<8} {'PRODUTO':<20} {'QUANTIDADE':<12} {'USUÁRIO':<20}")
+            print("-" * 90)
+            
+            for mov in movimentacoes_filtradas: #lista movimentações
+                tipo = "🎁 ENTRADA" if mov['tipo'] == 'ENTRADA' else "📦 SAÍDA"
+                usuario = mov.get('doador_nome', mov.get('solicitante_nome', 'Sistema'))[:18]
+                print(f"{mov['data']:<16} {tipo:<8} {mov['produto_nome'][:18]:<20} {mov['quantidade']:<12} {usuario:<20}")
+            
+            print("\n1. 🔄 Gerar outro relatório")
+            print("2. 🔙 Voltar ao menu anterior")
+            
+            opcao = input("\n📋 Escolha uma opção: ")
+            limpar_tela()
+            if opcao == "2":
+                return
+            # Se escolher 1 ou qualquer outra coisa, continua no loop
+
+        except ValueError:
+            print("❌ Opção inválida!")
+            pausar()
 
 def gerar_relatorio_pendencias():
-    """GERA RELATÓRIO DE PENDÊNCIAS EM PYTHON"""
+    """GERA RELATÓRIO DE PENDÊNCIAS EM PYTHON - Começa com relatório geral e permite filtrar"""
     exibir_cabecalho("RELATÓRIO DE PENDÊNCIAS")
     
-    if not pendencias:  #se não tiver pendencias
+    # Verifica se existem pendências no sistema
+    if not pendencias:  # se não tiver pendencias
         print("📭 Nenhuma pendência registrada.")
         pausar()
         return
     
-    # Estatísticas
-    #list comprehension: para filtrar tipos de pendencias em listas separadas
-    pendencias_pendentes = [p for p in pendencias if p['status'] == 'Pendente']
-    pendencias_aprovadas = [p for p in pendencias if p['status'] == 'Aprovada']
-    pendencias_reprovadas = [p for p in pendencias if p['status'] == 'Reprovada']
-    
-    print("📊 RESUMO DE PENDÊNCIAS:")
-    print(f"   ⏳ Pendentes: {len(pendencias_pendentes)}")
-    print(f"   ✅ Aprovadas: {len(pendencias_aprovadas)}")
-    print(f"   ❌ Reprovadas: {len(pendencias_reprovadas)}")
-    print(f"   📋 Total: {len(pendencias)}")
-    print("-" * 90)
-    
-    # List comprehension: filtrar entre listas entradas e saidas
-    entradas_pendentes = [p for p in pendencias_pendentes if p['tipo'] == 'ENTRADA']
-    saidas_pendentes = [p for p in pendencias_pendentes if p['tipo'] == 'SAIDA']
-    
-    print("\n📋 PENDÊNCIAS PENDENTES:")
-    print(f"   🎁 Entradas (doações): {len(entradas_pendentes)}")
-    print(f"   📦 Saídas (solicitações): {len(saidas_pendentes)}")
-    
-    if pendencias_pendentes:    #se exitem pendencias a ser avaliadas
-        print(f"\n📋 DETALHES DAS PENDÊNCIAS PENDENTES:") #gera cabeçalho
-        print(f"{'ID':<4} {'TIPO':<8} {'USUÁRIO':<20} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16}")
-        print("-" * 90)
+    # Loop principal para permitir que o administrador gere vários relatórios
+    while True:
+        # SEMPRE COMEÇA EXIBINDO O RELATÓRIO COMPLETO
+        exibir_cabecalho("RELATÓRIO COMPLETO DE PENDÊNCIAS")
         
-        for pend in pendencias_pendentes: # lista as pendencias a serem avaliadas
+        # ESTATÍSTICAS GERAIS DO SISTEMA
+        pendencias_pendentes = [p for p in pendencias if p['status'] == 'Pendente']
+        pendencias_aprovadas = [p for p in pendencias if p['status'] == 'Aprovada']
+        pendencias_reprovadas = [p for p in pendencias if p['status'] == 'Reprovada']
+        
+        # EXIBE O RESUMO ESTATÍSTICO COMPLETO
+        print("📊 RESUMO GERAL DO SISTEMA:")
+        print(f"   📋 Total de Pendências: {len(pendencias)}")
+        print(f"   ⏳ Pendentes: {len(pendencias_pendentes)}")
+        print(f"   ✅ Aprovadas: {len(pendencias_aprovadas)}")
+        print(f"   ❌ Reprovadas: {len(pendencias_reprovadas)}")
+        print("-" * 110)
+        
+        # EXIBE A TABELA COMPLETA COM TODAS AS PENDÊNCIAS
+        print("📋 TODAS AS PENDÊNCIAS DO SISTEMA:")
+        # Cabeçalho melhor alinhado
+        print(f"{'ID':<3} {'STATUS':<12} {'TIPO':<9} {'USUÁRIO':<22} {'PRODUTO':<20} {'QTD':<5} {'DATA SOLIC.':<16} {'DATA PROC.':<12}")
+        print("-" * 110)
+        
+        # PERCORRE E EXIBE TODAS AS PENDÊNCIAS
+        for pend in pendencias:
+            # Define o emoji e texto para o tipo de movimentação
             tipo = "🎁 ENTRADA" if pend['tipo'] == 'ENTRADA' else "📦 SAÍDA"
-            print(f"{pend['id']:<4} {tipo:<8} {pend['usuario_nome'][:18]:<20} {pend['produto_nome'][:18]:<20} "
-                  f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16}")
-    
-    pausar()
+            
+            # Define o emoji e texto para o status - usando abreviações para melhor alinhamento
+            if pend['status'] == 'Pendente':
+                status_text = "⏳ Pendente"
+            elif pend['status'] == 'Aprovada':
+                status_text = "✅ Aprovada"
+            else:  # Reprovada
+                status_text = "❌ Reprovada"
+            
+            # Obtém a data de processamento (se existir)
+            data_processamento = pend.get('data_processamento', 'N/A')
+            
+            # Formata as datas para tamanho consistente
+            data_solicitacao = pend['data_solicitacao'][:16]  # Mantém apenas DD/MM/AAAA HH:MM
+            if data_processamento != 'N/A':
+                data_processamento = data_processamento[:16]  # Mantém apenas DD/MM/AAAA HH:MM
+            
+            # Limita o tamanho dos textos para caber na tabela
+            usuario_nome = pend['usuario_nome'][:20]  # Máximo 20 caracteres
+            produto_nome = pend['produto_nome'][:18]  # Máximo 18 caracteres
+            
+            # Exibe a linha da tabela formatada com alinhamento melhorado
+            print(f"{pend['id']:<3} {status_text:<12} {tipo:<9} {usuario_nome:<22} {produto_nome:<20} "
+                  f"{pend['quantidade']:<5} {data_solicitacao:<16} {data_processamento:<12}")
+        
+        # MENU DE FILTROS
+        print("\n" + "=" * 50)
+        print("🎛️  FILTROS DISPONÍVEIS:")
+        print("=" * 50)
+        print("1. 🔍 Filtrar apenas Pendências Pendentes")
+        print("2. ✅ Filtrar apenas Pendências Aprovadas")
+        print("3. ❌ Filtrar apenas Pendências Reprovadas")
+        print("4. 🏠 Voltar ao Menu de Relatórios")
+        print("-" * 50)
+        
+        try:
+            # Solicita a opção de filtro do usuário
+            opcao_filtro = input("\n📋 Escolha um filtro ou opção: ").strip()
+            
+            # OPÇÃO 4: VOLTAR AO MENU ANTERIOR
+            if opcao_filtro == '4':
+                break
+            
+            # APLICA OS FILTROS CONFORME A OPÇÃO ESCOLHIDA
+            elif opcao_filtro == '1':
+                pendencias_filtradas = [p for p in pendencias if p['status'] == 'Pendente']
+                titulo_filtro = "PENDÊNCIAS PENDENTES"
+                
+            elif opcao_filtro == '2':
+                pendencias_filtradas = [p for p in pendencias if p['status'] == 'Aprovada']
+                titulo_filtro = "PENDÊNCIAS APROVADAS"
+                
+            elif opcao_filtro == '3':
+                pendencias_filtradas = [p for p in pendencias if p['status'] == 'Reprovada']
+                titulo_filtro = "PENDÊNCIAS REPROVADAS"
+                
+            else:
+                print("❌ Opção de filtro inválida!")
+                pausar()
+                continue
+            
+            # VERIFICA SE HÁ DADOS PARA O FILTRO APLICADO
+            if not pendencias_filtradas:
+                print(f"📭 Nenhuma pendência encontrada para o filtro '{titulo_filtro}'.")
+                pausar()
+                continue
+            
+            # EXIBE O RELATÓRIO FILTRADO
+            exibir_cabecalho(f"RELATÓRIO FILTRADO - {titulo_filtro}")
+            
+            # ESTATÍSTICAS DO RELATÓRIO FILTRADO
+            total_filtrado = len(pendencias_filtradas)
+            entradas_filtradas = [p for p in pendencias_filtradas if p['tipo'] == 'ENTRADA']
+            saidas_filtradas = [p for p in pendencias_filtradas if p['tipo'] == 'SAIDA']
+            
+            print(f"📊 RESUMO DO FILTRO:")
+            print(f"   📋 Total: {total_filtrado} pendências")
+            print(f"   🎁 Entradas: {len(entradas_filtradas)}")
+            print(f"   📦 Saídas: {len(saidas_filtradas)}")
+            print("-" * 110)
+            
+            # EXIBE A TABELA FILTRADA
+            print(f"{'ID':<3} {'STATUS':<12} {'TIPO':<9} {'USUÁRIO':<22} {'PRODUTO':<20} {'QTD':<5} {'DATA SOLIC.':<16} {'DATA PROC.':<12}")
+            print("-" * 110)
+            
+            for pend in pendencias_filtradas:
+                tipo = "🎁 ENTRADA" if pend['tipo'] == 'ENTRADA' else "📦 SAÍDA"
+                
+                if pend['status'] == 'Pendente':
+                    status_text = "⏳ Pendente"
+                elif pend['status'] == 'Aprovada':
+                    status_text = "✅ Aprovada"
+                else:
+                    status_text = "❌ Reprovada"
+                
+                data_processamento = pend.get('data_processamento', 'N/A')
+                data_solicitacao = pend['data_solicitacao'][:16]
+                if data_processamento != 'N/A':
+                    data_processamento = data_processamento[:16]
+                
+                usuario_nome = pend['usuario_nome'][:20]
+                produto_nome = pend['produto_nome'][:18]
+                
+                print(f"{pend['id']:<3} {status_text:<12} {tipo:<9} {usuario_nome:<22} {produto_nome:<20} "
+                      f"{pend['quantidade']:<5} {data_solicitacao:<16} {data_processamento:<12}")
+            
+            # OPÇÕES DE CONTINUAÇÃO
+            print("\n1. 🔄 Voltar ao Relatório Completo")
+            print("2. 🏠 Voltar ao Menu de Relatórios")
+            
+            opcao_continuar = input("\n📋 Escolha uma opção: ").strip()
+            
+            if opcao_continuar == '2':
+                break
+            
+        except Exception as e:
+            print(f"❌ Erro ao processar filtro: {e}")
+            pausar()
 
 def menu_relatorios():
     """MENU DE RELATÓRIOS EM PYTHON"""
