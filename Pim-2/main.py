@@ -718,6 +718,7 @@ def minhas_doacoes_pendentes():
     #                   Gera lista de Pendencias 👆👆
     if not minhas_pendencias:# verifica se não existem pendencias
         print("📭 Você não tem doações pendentes.")
+        pausar()
         return
     
     #cabeçalho da tebela
@@ -1577,7 +1578,7 @@ def menu_administrador():
         
         print("1. ✅ Aprovar/Reprovar Pendências")
         print("2. 📦 Visualizar Estoque")
-        print("3. 🗑️  Remover Produtos Vencidos")  # NOVA OPÇÃO
+        print("3. 🗑️  Remover Produtos Vencidos")  
         print("4. 📊 Relatórios")
         print("5. 👥 Gerenciar Usuários")
         print("6. 👤 Meu Perfil")
@@ -1590,7 +1591,7 @@ def menu_administrador():
             menu_aprovar_pendencias()
         elif opcao == '2':
             visualizar_estoque()
-        elif opcao == '3':  # NOVA OPÇÃO
+        elif opcao == '3':  
             remover_produtos_vencidos()
         elif opcao == '4':
             menu_relatorios()
