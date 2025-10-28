@@ -151,7 +151,21 @@ def limpar_telefone(telefone):
     """Limpa formatação do telefone, mantendo apenas dígitos"""
     if not telefone:
         return ""
-    return ''.join(filter(str.isdigit, str(telefone)))
+    
+    # Remove todos os caracteres não numéricos
+    telefone_limpo = ''.join(filter(str.isdigit, str(telefone)))
+    
+    return telefone_limpo
+
+def estruturar_telefone(telefone_limpo):
+    """Estrutura o telefone no formato brasileiro"""
+    if len(telefone_limpo) == 11:  # Celular com 9 dígitos
+        return f"({telefone_limpo[0:2]}) {telefone_limpo[2:7]}-{telefone_limpo[7:]}"
+    elif len(telefone_limpo) == 10:  # Telefone fixo com 8 dígitos
+        return f"({telefone_limpo[0:2]}) {telefone_limpo[2:6]}-{telefone_limpo[6:]}"
+    else:
+        return telefone_limpo  # Retorna como está se não for formato esperado
+
 
 def validar_formatar_cpf(cpf: str):
     """
@@ -341,7 +355,7 @@ def cadastrar_usuario():
     cpf = input("📄 CPF (apenas números): ").strip()
     telefone = input("📞 Telefone com DDD: ").strip()
     
-    #verifica entrada entradas vazias
+    #verifica entradas vazias
     for info in [nome, email, cpf, telefone]:
         if  not info:
             print("❌ Por favor, preencha todos os campos!")
@@ -381,6 +395,18 @@ def cadastrar_usuario():
     else:
         print(resultado)  # mostra mensagem de erro
         return  #pede para digitar novamente
+    
+    #formatação telefone
+    telefone_limpo = limpar_telefone(telefone)
+
+    # Validação do telefone
+    if len(telefone_limpo) < 10 or len(telefone_limpo) > 11:
+        print("❌ Telefone deve conter DDD (2 dígitos) + número (8 ou 9 dígitos)!")
+        pausar()
+        return
+
+    # Estrutura o telefone no formato brasileiro
+    telefone = estruturar_telefone(telefone_limpo)
 
     # Menu de seleção de perfil por número
     print("\n🎭 Selecione o perfil do usuário:")
