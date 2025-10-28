@@ -295,48 +295,85 @@ def recuperar_senha():
     pausar()
 
 def alterar_senha():
-        """REDEFINE SENHA DO USUÁRIO LOGADO"""
-        exibir_cabecalho("REDEFINIR SENHA")
-        
-        print("🔐 Redefinição de Senha")
-        print("-" * 30)
-        #   Pede senha ao usuario
-        senha_atual = input("🔒 Senha atual: ").strip()
-        
-        #Verifica se senha está incorreta
-        if senha_atual != usuario_logado['senha']:
-            print("\n❌ Senha atual incorreta!")
-            pausar()
-            return
-        
-        #pede ao usuario para redefinir senha
+    """REDEFINE SENHA DO USUÁRIO LOGADO"""
+    exibir_cabecalho("REDEFINIR SENHA")
+    
+    print("🔐 Redefinição de Senha")
+    print("-" * 30)
+    
+    # Pede senha atual ao usuario
+    senha_atual = input("🔒 Senha atual: ").strip()
+    
+    # Verifica se senha está incorreta
+    if senha_atual != usuario_logado['senha']:
+        print("\n❌ Senha atual incorreta!")
+        pausar()
+        return
+    
+    # Solicita e valida a nova senha
+    print("\n🔐 Nova Senha - Requisitos:")
+    print("   • Mínimo 8 caracteres")
+    print("   • Pelo menos 1 letra maiúscula")
+    print("   • Pelo menos 1 letra minúscula") 
+    print("   • Pelo menos 1 número")
+    print("   • Pelo menos 1 caractere especial (!@#$%&*)")
+    print("-" * 50)
+    
+    while True:
         nova_senha = input("🆕 Nova senha: ").strip()
         confirmar_senha = input("✅ Confirmar nova senha: ").strip()
         
-        #se senha não se coincidirem
         if nova_senha != confirmar_senha:
-            print("\n❌ As senhas não coincidem!")
-            pausar()
-            return
+            print("❌ As senhas não coincidem! Tente novamente.\n")
+            continue
         
-        #se senha não atender requisito de tamanho
-        if len(nova_senha) < 6:
-            print("\n❌ A senha deve ter pelo menos 6 caracteres!")
-            pausar()
-            return
+        # Validação da senha integrada
+        senha_valida = True
+        erros = []
         
-        #usuario tem sua senha alterada na variavel logado
-        usuario_logado['senha'] = nova_senha
+        if len(nova_senha) < 8:
+            senha_valida = False
+            erros.append("❌ A senha deve ter pelo menos 8 caracteres")
         
-        #usuario tem sua senha alterada na lista em memoria
-        for usuario in usuarios:
-            if usuario['id'] == usuario_logado['id']:
-                usuario['senha'] = nova_senha
-                break
+        # Verifica requisitos de complexidade
+        tem_maiuscula = any(char.isupper() for char in nova_senha)
+        tem_minuscula = any(char.islower() for char in nova_senha)
+        tem_numero = any(char.isdigit() for char in nova_senha)
+        tem_especial = any(not char.isalnum() for char in nova_senha)
+
+        if not tem_maiuscula:
+            senha_valida = False
+            erros.append("❌ A senha deve conter pelo menos 1 letra maiúscula")
+        if not tem_minuscula:
+            senha_valida = False
+            erros.append("❌ A senha deve conter pelo menos 1 letra minúscula")
+        if not tem_numero:
+            senha_valida = False
+            erros.append("❌ A senha deve conter pelo menos 1 número")
+        if not tem_especial:
+            senha_valida = False
+            erros.append("❌ A senha deve conter pelo menos 1 caractere especial (!@#$%&*)")
         
-        salvar_dados() # salva lista em memoria para .json
-        print(f"\n✅ Senha redefinida com sucesso!")
-        pausar()
+        if not senha_valida:
+            print("\n")
+            for e in erros:
+                print(e)
+            print("\n") 
+            continue
+        break  # Senha válida, sai do loop
+    
+    # Atualiza a senha
+    usuario_logado['senha'] = nova_senha
+    
+    # Atualiza a senha na lista em memoria
+    for usuario in usuarios:
+        if usuario['id'] == usuario_logado['id']:
+            usuario['senha'] = nova_senha
+            break
+    
+    salvar_dados() # salva lista em memoria para .json
+    print(f"\n✅ Senha redefinida com sucesso!")
+    pausar()
 
 # =============================================
 # MÓDULO DE GERENCIAMENTO DE USUÁRIOS
