@@ -395,7 +395,8 @@ def cadastrar_usuario():
         if  not info:
             print("❌ Por favor, preencha todos os campos!")
             return
-    
+        
+
     #verifica se email tem estrutura valida
     if email.count("@") != 1:   #verifica existencia necessaria de @
         print("❌ O e-mail deve conter apenas um '@'.")
@@ -431,6 +432,20 @@ def cadastrar_usuario():
         print(resultado)  # mostra mensagem de erro
         return  #pede para digitar novamente
     
+    # 1. Verifica se email já existe no sistema
+    email_existente = next((u for u in usuarios if u['email'] == email), None)
+    if email_existente:
+        print("❌ Este e-mail já está em uso por outro usuário!")
+        pausar()
+        return
+
+    # 2. Verifica se CPF já existe no sistema
+    cpf_existente = next((u for u in usuarios if u['cpf'] == cpf), None)
+    if cpf_existente:
+        print("❌ Este CPF já está cadastrado no sistema!")
+        pausar()
+        return
+    
     #formatação telefone
     telefone_limpo = limpar_telefone(telefone)
 
@@ -442,6 +457,7 @@ def cadastrar_usuario():
 
     # Estrutura o telefone no formato brasileiro
     telefone = estruturar_telefone(telefone_limpo)
+    
 
     # Menu de seleção de perfil por número
     print("\n🎭 Selecione o perfil do usuário:")
