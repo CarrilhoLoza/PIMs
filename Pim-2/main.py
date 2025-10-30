@@ -727,7 +727,7 @@ def registrar_doacao_pendente():
     
     # Coleta dados do produto
     nome = input("📦 Nome do produto: ").strip()
-    descricao = input("📄 Descrição (opcionnal): ").strip()
+    descricao = input("📄 Descrição (opcional): ").strip()
     categoria = input("🏷️  Categoria (Alimento, Medicamento etc): ").strip()
     
     try: # try corrige valores não numericos
@@ -740,7 +740,7 @@ def registrar_doacao_pendente():
         return
 
     #verifica entrada entradas vazias
-    for info in [nome, descricao, peso, quantidade, data_validade]:
+    for info in [nome, peso, quantidade, data_validade]:
         if  not info:
             print("❌ Por favor, preencha todos os campos!")
             pausar()
