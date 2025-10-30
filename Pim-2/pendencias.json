@@ -103,5 +103,31 @@
     "data_modificacao": "29/10/2025 22:46",
     "data_exclusao": "29/10/2025 22:47",
     "excluido_por": "Supermercado Preço Bom"
+  },
+  {
+    "id": 8,
+    "tipo": "ENTRADA",
+    "produto_nome": "teste2",
+    "produto_descricao": "",
+    "produto_categoria": "teste",
+    "produto_peso": 10.0,
+    "produto_validade": "10/12/2025",
+    "quantidade": 2,
+    "usuario_id": 8,
+    "usuario_nome": "Distribuidora Alimentícia",
+    "data_solicitacao": "30/10/2025 16:09",
+    "status": "Pendente"
+  },
+  {
+    "id": 9,
+    "tipo": "SAIDA",
+    "produto_id": 10,
+    "produto_nome": "Água Mineral 500ml",
+    "quantidade": 7,
+    "usuario_id": 9,
+    "usuario_nome": "Ana Cristina Pereira",
+    "data_solicitacao": "30/10/2025 16:54",
+    "status": "Pendente",
+    "data_modificacao": "30/10/2025 17:01"
   }
 ]
