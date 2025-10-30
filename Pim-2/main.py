@@ -166,7 +166,6 @@ def estruturar_telefone(telefone_limpo):
     else:
         return telefone_limpo  # Retorna como está se não for formato esperado
 
-
 def validar_formatar_cpf(cpf: str):
     """
     Valida CPF (com dígitos verificadores) e retorna formatado.
@@ -199,7 +198,6 @@ def validar_formatar_cpf(cpf: str):
     # Formata CPF no padrão XXX.XXX.XXX-XX
     cpf_formatado = f"{cpf_limpo[:3]}.{cpf_limpo[3:6]}.{cpf_limpo[6:9]}-{cpf_limpo[9:]}"
     return (cpf_formatado, True)
-
 
 def gerar_senha_temporaria(tamanho = 8):
     """GERA SENHA TEMPORÁRIA ALEATÓRIA"""
@@ -777,9 +775,6 @@ def minhas_doacoes_pendentes():
     """
     MINHAS DOAÇÕES PENDENTES - Para doadores (apenas ATIVAS)
     
-    Estudante: Esta função foi CORRIGIDA para mostrar APENAS pendências ATIVAS
-    As pendências "excluídas" (status 'Desativada') NÃO aparecem mais
-    
     🔍 FILTRO IMPORTANTE: 
     - usuario_id: Apenas do usuário logado
     - tipo: Apenas ENTRADA (doações)
@@ -788,7 +783,7 @@ def minhas_doacoes_pendentes():
     exibir_cabecalho("MINHAS DOAÇÕES PENDENTES")
     
     # 🔍 FILTRO CORRIGIDO: Apenas pendências ATIVAS do usuário
-    # Estudante: Note que adicionamos 'p['status'] == 'Pendente'' ao filtro
+    # adicionado 'p['status'] == 'Pendente'' ao filtro
     # Isso garante que apenas pendências ATIVAS serão mostradas
     minhas_pendencias = [p for p in pendencias 
                         if p['usuario_id'] == usuario_logado['id']  # 👈 Do usuário logado
@@ -920,9 +915,6 @@ def minhas_solicitacoes_pendentes():
     """
     MINHAS SOLICITAÇÕES PENDENTES - Para solicitantes (apenas ATIVAS)
     
-    Estudante: Esta função foi CORRIGIDA com o mesmo princípio da anterior
-    Agora mostra APENAS solicitações ATIVAS, as "excluídas" desaparecem
-    
     🎯 CONCEITO: Consistência de Filtros
     - Mesma lógica para doações e solicitações
     - Usuário só vê o que está realmente ativo
@@ -931,7 +923,7 @@ def minhas_solicitacoes_pendentes():
     exibir_cabecalho("MINHAS SOLICITAÇÕES PENDENTES")
     
     # 🔍 FILTRO CORRIGIDO: Apenas pendências ATIVAS do usuário
-    # Estudante: Mesmo filtro, mas para SAIDA (solicitações) em vez de ENTRADA
+    # Mesmo filtro, mas para SAIDA (solicitações) em vez de ENTRADA
     minhas_pendencias = [p for p in pendencias 
                         if p['usuario_id'] == usuario_logado['id']  # 👈 Do usuário logado
                         and p['tipo'] == 'SAIDA'                    # 👈 Apenas solicitações
@@ -956,350 +948,6 @@ def minhas_solicitacoes_pendentes():
     
     pausar()
 
-# =============================================
-# FUNÇÕES PARA EDITAR PENDÊNCIAS
-# =============================================
-
-def editar_pendencia_doador(pendencia):
-    """
-    EDITAR PENDÊNCIA DE DOAÇÃO - Para doadores
-    Permite que o doador modifique os dados de uma doação pendente
-    
-    Estudante: Esta função mostra como implementar um formulário de edição
-    com preservação de dados antigos e validações
-    """
-    exibir_cabecalho("EDITAR DOAÇÃO PENDENTE")
-    
-    print(f"📝 Editando Doação Pendente - ID: {pendencia['id']}")
-    print("-" * 50)
-    
-    # 🔍 EXIBIÇÃO DOS DADOS ATUAIS
-    print("📋 Dados atuais:")
-    print(f"📦 Nome do produto: {pendencia['produto_nome']}")
-    print(f"📄 Descrição: {pendencia.get('produto_descricao', 'Nenhuma')}")
-    print(f"🏷️  Categoria: {pendencia.get('produto_categoria', 'Nenhuma')}")
-    print(f"⚖️  Peso: {pendencia.get('produto_peso', 0)} kg")
-    print(f"📊 Quantidade: {pendencia['quantidade']}")
-    print(f"📅 Data de validade: {pendencia.get('produto_validade', 'Não informada')}")
-    print("-" * 50)
-    
-    # ✏️ COLETA DE NOVOS DADOS
-    print("📝 Digite os novos dados (deixe em branco para manter o valor atual):")
-    
-    novo_nome = input(f"📦 Novo nome do produto [{pendencia['produto_nome']}]: ").strip()
-    nova_descricao = input(f"📄 Nova descrição [{pendencia.get('produto_descricao', '')}]: ").strip()
-    nova_categoria = input(f"🏷️  Nova categoria [{pendencia.get('produto_categoria', '')}]: ").strip()
-    novo_peso = input(f"⚖️  Novo peso (kg) [{pendencia.get('produto_peso', 0)}]: ").strip()
-    nova_quantidade = input(f"📊 Nova quantidade [{pendencia['quantidade']}]: ").strip()
-    nova_validade = input(f"📅 Nova data de validade (DD/MM/AAAA) [{pendencia.get('produto_validade', '')}]: ").strip()
-    
-    # 🔄 APLICAÇÃO DAS ALTERAÇÕES
-    alteracoes = False
-    
-    if novo_nome and novo_nome != pendencia['produto_nome']:
-        pendencia['produto_nome'] = novo_nome
-        alteracoes = True
-        print("✅ Nome do produto atualizado!")
-    
-    if nova_descricao != pendencia.get('produto_descricao', ''):
-        pendencia['produto_descricao'] = nova_descricao
-        alteracoes = True
-        print("✅ Descrição atualizada!")
-    
-    if nova_categoria and nova_categoria != pendencia.get('produto_categoria', ''):
-        pendencia['produto_categoria'] = nova_categoria
-        alteracoes = True
-        print("✅ Categoria atualizada!")
-    
-    # 🎯 VALIDAÇÃO DE CAMPOS NUMÉRICOS
-    if novo_peso:
-        try:
-            novo_peso_float = float(novo_peso)
-            if novo_peso_float != pendencia.get('produto_peso', 0):
-                pendencia['produto_peso'] = novo_peso_float
-                alteracoes = True
-                print("✅ Peso atualizado!")
-        except ValueError:
-            print("❌ Peso inválido! Mantendo valor anterior.")
-    
-    if nova_quantidade:
-        try:
-            nova_quantidade_int = int(nova_quantidade)
-            if nova_quantidade_int != pendencia['quantidade']:
-                pendencia['quantidade'] = nova_quantidade_int
-                alteracoes = True
-                print("✅ Quantidade atualizada!")
-        except ValueError:
-            print("❌ Quantidade inválida! Mantendo valor anterior.")
-    
-    if nova_validade and nova_validade != pendencia.get('produto_validade', ''):
-        pendencia['produto_validade'] = nova_validade
-        alteracoes = True
-        print("✅ Data de validade atualizada!")
-    
-    # 💾 SALVAMENTO E REGISTRO DE MODIFICAÇÃO
-    if alteracoes:
-        pendencia['data_modificacao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-        salvar_dados()
-        print(f"\n🎉 Doação atualizada com sucesso!")
-        print(f"📅 Última modificação: {pendencia['data_modificacao']}")
-    else:
-        print(f"\nℹ️  Nenhuma alteração foi realizada.")
-    
-    pausar()
-
-def editar_pendencia_solicitante(pendencia):
-    """
-    EDITAR PENDÊNCIA DE SOLICITAÇÃO - Para solicitantes
-    Permite que o solicitante altere a quantidade solicitada
-    
-    Estudante: Esta função é mais simples porque só permite alterar quantidade
-    Mostra como fazer validação baseada em regras de negócio (estoque disponível)
-    """
-    exibir_cabecalho("EDITAR SOLICITAÇÃO PENDENTE")
-    
-    print(f"📝 Editando Solicitação Pendente - ID: {pendencia['id']}")
-    print("-" * 50)
-    
-    # 📊 CONTEXTUALIZAÇÃO COM DADOS ATUAIS
-    print("📋 Dados atuais:")
-    print(f"📦 Produto: {pendencia['produto_nome']}")
-    print(f"📊 Quantidade solicitada: {pendencia['quantidade']}")
-    print("-" * 50)
-    
-    # 🔍 VERIFICAÇÃO DE ESTOQUE
-    produto = next((p for p in produtos if p['id'] == pendencia['produto_id']), None)
-    if produto:
-        print(f"📦 Estoque disponível: {produto['quantidade']} unidades")
-        print("-" * 50)
-    
-    # ✏️ COLETA DA NOVA QUANTIDADE
-    print("📝 Digite os novos dados (deixe em branco para manter o valor atual):")
-    nova_quantidade = input(f"📊 Nova quantidade desejada [{pendencia['quantidade']}]: ").strip()
-    
-    # 🔄 PROCESSAMENTO DA ALTERAÇÃO
-    alteracoes = False
-    
-    if nova_quantidade:
-        try:
-            nova_quantidade_int = int(nova_quantidade)
-            
-            # 🚨 VALIDAÇÃO DE REGRA DE NEGÓCIO
-            if produto and nova_quantidade_int > produto['quantidade']:
-                print(f"❌ Quantidade solicitada ({nova_quantidade_int}) maior que estoque disponível ({produto['quantidade']})!")
-                pausar()
-                return
-            
-            # ✅ APLICA A ALTERAÇÃO SE VÁLIDA
-            if nova_quantidade_int != pendencia['quantidade']:
-                pendencia['quantidade'] = nova_quantidade_int
-                alteracoes = True
-                print("✅ Quantidade atualizada!")
-        except ValueError:
-            print("❌ Quantidade inválida! Mantendo valor anterior.")
-    
-    # 💾 SALVAMENTO COM REGISTRO
-    if alteracoes:
-        pendencia['data_modificacao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-        salvar_dados()
-        print(f"\n🎉 Solicitação atualizada com sucesso!")
-        print(f"📅 Última modificação: {pendencia['data_modificacao']}")
-    else:
-        print(f"\nℹ️  Nenhuma alteração foi realizada.")
-    
-    pausar()
-
-def excluir_pendencia(pendencia):
-    """
-    "EXCLUIR" PENDÊNCIA - Soft Delete com experiência de exclusão
-    
-    Estudante: O usuário acha que está excluindo permanentemente,
-    mas estamos apenas marcando como desativada (Soft Delete)
-    """
-    exibir_cabecalho("EXCLUIR PENDÊNCIA")
-    
-    print(f"🗑️  Excluindo Pendência - ID: {pendencia['id']}")
-    print("-" * 50)
-    
-    # Mostra o que será "excluído"
-    if pendencia['tipo'] == 'ENTRADA':
-        print(f"🎁 Doação: {pendencia['produto_nome']}")
-        print(f"📊 Quantidade: {pendencia['quantidade']}")
-    else:
-        print(f"📦 Solicitação: {pendencia['produto_nome']}")
-        print(f"📊 Quantidade: {pendencia['quantidade']}")
-    
-    print(f"📅 Data de solicitação: {pendencia['data_solicitacao']}")
-    print("-" * 50)
-    
-    # Confirmação dramática
-    print("\n⚠️  ATENÇÃO: Esta operação não pode ser desfeita!")
-    confirmar = input("\n❓ Confirmar exclusão? (digite 'CONFIRMAR'): ").strip()
-    
-    if confirmar.upper() == 'CONFIRMAR':
-        # 🔄 SOFT DELETE - apenas muda o status
-        pendencia['status'] = 'Desativada'
-        pendencia['data_exclusao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
-        pendencia['excluido_por'] = usuario_logado['nome']
-        
-        salvar_dados()
-        
-        # Feedback de "exclusão bem-sucedida"
-        print(f"\n✅ Pendência excluída com sucesso!")
-        print(f"📛 Registro removido do sistema")
-        print(f"⏰ Data da exclusão: {pendencia['data_exclusao']}")
-    else:
-        print(f"\n❌ Exclusão cancelada.")
-    
-    pausar()
-
-def recuperar_pendencias_excluidas():
-    """
-    RECUPERAR PENDÊNCIAS "EXCLUÍDAS" - Apenas para administradores
-    
-    Estudante: Esta função mostra a "parte oculta" do Soft Delete
-    Enquanto usuários comuns acham que excluíram, administradores podem ver tudo
-    """
-    exibir_cabecalho("PENDÊNCIAS EXCLUÍDAS - ÁREA ADMINISTRATIVA")
-    
-    # 🔍 BUSCA APENAS PENDÊNCIAS DESATIVADAS (as "excluídas")
-    pendencias_excluidas = [p for p in pendencias if p['status'] == 'Desativada']
-    
-    if not pendencias_excluidas:
-        print("📭 Nenhuma pendência excluída encontrada.")
-        pausar()
-        return
-    
-    print("🔍 PENDÊNCIAS EXCLUÍDAS DO SISTEMA:")
-    print("   (Esta área é restrita a administradores)")
-    print("-" * 100)
-    print(f"{'ID':<4} {'TIPO':<8} {'USUÁRIO':<20} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA EXCLUSÃO':<16}")
-    print("-" * 100)
-    
-    for pend in pendencias_excluidas:
-        tipo = "🎁 DOAÇÃO" if pend['tipo'] == 'ENTRADA' else "📦 SOLICITAÇÃO"
-        print(f"{pend['id']:<4} {tipo:<8} {pend['usuario_nome'][:18]:<20} {pend['produto_nome'][:18]:<20} "
-              f"{pend['quantidade']:<12} {pend.get('data_exclusao', 'N/A')[:16]:<16}")
-    
-    pausar()
-
-def gerenciar_minhas_pendencias_doador():
-    """
-    GERENCIA PENDÊNCIAS DO DOADOR - Editar/Excluir
-    
-    Estudante: Interface simplificada onde usuário só vê pendências ativas
-    e tem opção de Editar ou "Excluir" (Soft Delete)
-    """
-    exibir_cabecalho("GERENCIAR MINHAS DOAÇÕES")
-    
-    # 🔍 FILTRO: Apenas pendências ATIVAS do usuário
-    minhas_pendencias = [p for p in pendencias 
-                        if p['usuario_id'] == usuario_logado['id'] 
-                        and p['tipo'] == 'ENTRADA' 
-                        and p['status'] == 'Pendente']
-    
-    if not minhas_pendencias:
-        print("📭 Você não tem doações ativas para gerenciar.")
-        pausar()
-        return
-    
-    # 📋 LISTA APENAS PENDÊNCIAS ATIVAS
-    print("🎁 SUAS DOAÇÕES ATIVAS:")
-    print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16} {'MODIFICAÇÃO':<16}")
-    print("-" * 80)
-    
-    for pend in minhas_pendencias:
-        data_modificacao = pend.get('data_modificacao', 'Nunca')
-        print(f"{pend['id']:<4} {pend['produto_nome'][:18]:<20} "
-              f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16} {data_modificacao[:16]:<16}")
-    
-    try:
-        pendencia_id = int(input("\n📋 ID da pendência para gerenciar: "))
-        pendencia = next((p for p in minhas_pendencias if p['id'] == pendencia_id), None)
-        
-        if pendencia:
-            print(f"\n🎛️  Opções para Doação ID {pendencia_id}:")
-            print("1. ✏️  Editar Doação")
-            print("2. 🗑️  Excluir Doação")
-            print("3. 🔙 Voltar")
-            
-            opcao = input("\n📋 Escolha uma opção: ")
-            
-            if opcao == '1':
-                editar_pendencia_doador(pendencia)
-            elif opcao == '2':
-                excluir_pendencia(pendencia)
-            elif opcao == '3':
-                return
-            else:
-                print("❌ Opção inválida!")
-                pausar()
-        else:
-            print("❌ Pendência não encontrada ou não pertence a você!")
-            pausar()
-            
-    except ValueError:
-        print("❌ Por favor, digite um ID válido!")
-        pausar()
-
-def gerenciar_minhas_pendencias_solicitante():
-    """
-    GERENCIA PENDÊNCIAS DO SOLICITANTE - Editar/Excluir
-    
-    Estudante: Mesma estrutura do doador, mas para solicitações
-    Mantém consistência na experiência do usuário
-    """
-    exibir_cabecalho("GERENCIAR MINHAS SOLICITAÇÕES")
-    
-    # 🔍 FILTRO: Apenas pendências ATIVAS do usuário
-    minhas_pendencias = [p for p in pendencias 
-                        if p['usuario_id'] == usuario_logado['id'] 
-                        and p['tipo'] == 'SAIDA' 
-                        and p['status'] == 'Pendente']
-    
-    if not minhas_pendencias:
-        print("📭 Você não tem solicitações ativas para gerenciar.")
-        pausar()
-        return
-    
-    # 📋 LISTA APENAS SOLICITAÇÕES ATIVAS
-    print("📋 SUAS SOLICITAÇÕES ATIVAS:")
-    print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16} {'MODIFICAÇÃO':<16}")
-    print("-" * 80)
-    
-    for pend in minhas_pendencias:
-        data_modificacao = pend.get('data_modificacao', 'Nunca')
-        print(f"{pend['id']:<4} {pend['produto_nome'][:18]:<20} "
-              f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16} {data_modificacao[:16]:<16}")
-    
-    try:
-        pendencia_id = int(input("\n📋 ID da pendência para gerenciar: "))
-        pendencia = next((p for p in minhas_pendencias if p['id'] == pendencia_id), None)
-        
-        if pendencia:
-            print(f"\n🎛️  Opções para Solicitação ID {pendencia_id}:")
-            print("1. ✏️  Editar Solicitação")
-            print("2. 🗑️  Excluir Solicitação")
-            print("3. 🔙 Voltar")
-            
-            opcao = input("\n📋 Escolha uma opção: ")
-            
-            if opcao == '1':
-                editar_pendencia_solicitante(pendencia)
-            elif opcao == '2':
-                excluir_pendencia(pendencia)
-            elif opcao == '3':
-                return
-            else:
-                print("❌ Opção inválida!")
-                pausar()
-        else:
-            print("❌ Pendência não encontrada ou não pertence a você!")
-            pausar()
-            
-    except ValueError:
-        print("❌ Por favor, digite um ID válido!")
-        pausar()
 
 # =============================================
 # MÓDULO PARA ADMINISTRADORES
@@ -1309,9 +957,6 @@ def listar_todas_pendencias():
     """
     LISTA TODAS AS PENDÊNCIAS - Para administradores (apenas ATIVAS)
     
-    Estudante: Esta função também foi CORRIGIDA para mostrar apenas ATIVAS
-    O administrador só precisa ver pendências que precisam de ação
-    
     🎯 CONCEITO: Foco na Ação
     - Admin só vê pendências que precisam ser aprovadas/reprovadas
     - Pendências "excluídas" não aparecem (já foram resolvidas pelo usuário)
@@ -1320,7 +965,7 @@ def listar_todas_pendencias():
     exibir_cabecalho("TODAS AS PENDÊNCIAS")
     
     # 🔍 FILTRO CORRIGIDO: Apenas pendências ATIVAS
-    # Estudante: Admin também só vê as ATIVAS para aprovação
+    #Admin também só vê as ATIVAS para aprovação
     pendencias_pendentes = [p for p in pendencias if p['status'] == 'Pendente']
     
     # 📭 VERIFICA SE NÃO HÁ PENDÊNCIAS ATIVAS
@@ -1457,9 +1102,6 @@ def aprovar_reprovar_pendencias():
     """
     APROVAR/REPROVAR PENDÊNCIAS - Função principal dos administradores
     
-    Estudante: Esta função foi CORRIGIDA para trabalhar apenas com pendências ATIVAS
-    O admin não pode aprovar/reprovar pendências que já foram "excluídas"
-    
     🔧 FLUXO CORRIGIDO:
     1. Mostra apenas pendências ATIVAS
     2. Permite aprovar/reprovar apenas ATIVAS
@@ -1494,7 +1136,7 @@ def aprovar_reprovar_pendencias():
         acao = input("✅ Aprovar (a) ou ❌ Reprovar (r)? ").lower()
         
         # 🔍 BUSCA A PENDÊNCIA APENAS ENTRE AS ATIVAS
-        # Estudante: Note que buscamos apenas entre pendências com status 'Pendente'
+        #é buscado apenas entre pendências com status 'Pendente'
         # Isso evita que admin tente processar pendências "excluídas"
         pendencia = next((p for p in pendencias if p['id'] == pendencia_id and p['status'] == 'Pendente'), None)
         
@@ -1546,82 +1188,29 @@ def menu_aprovar_pendencias():
             print("❌ Opção inválida!")
         pausar()
 
-def verificar_produtos_proximos_vencimento():
-    """VERIFICA PRODUTOS PRÓXIMOS DO VENCIMENTO"""
-    produtos_proximos = []
-    hoje = datetime.datetime.now()
-    
-    for produto in produtos:
-        try:
-            #converte string para datetime e faz operações
-            data_validade = datetime.datetime.strptime(produto['data_validade'], "%d/%m/%Y")
-            dias_para_vencer = (data_validade - hoje).days
-            if 0 <= dias_para_vencer <= 30: #verifica produtos com vencimento em até 30 dias
-                produtos_proximos.append(produto)   #adiciona a lista a de "perto de vencer"
-        except: #Se houver erro na conversão da data, pula para o próximo produto
-            continue
-    
-    return produtos_proximos  #retorna lista de produtos perto do vencimento
-
-def verificar_produtos_vencidos():
-    """VERIFICA PRODUTOS JÁ VENCIDOS"""
-    produtos_vencidos = []
-    hoje = datetime.datetime.now()
-    
-    for produto in produtos:
-        try:
-            data_validade = datetime.datetime.strptime(produto['data_validade'], "%d/%m/%Y")
-            if data_validade < hoje:  # Produtos com data anterior à atual
-                produtos_vencidos.append(produto)
-        except:
-            continue
-    
-    return produtos_vencidos
-
-def remover_produtos_vencidos():
-    """REMOVE PRODUTOS VENCIDOS DO ESTOQUE"""
-    produtos_vencidos = verificar_produtos_vencidos()
-    
-    if not produtos_vencidos:
-        print("✅ Nenhum produto vencido encontrado!")
-        pausar()
-        return
-    
-    print(f"🚨 Encontrados {len(produtos_vencidos)} produtos vencidos:")
-    for produto in produtos_vencidos:
-        print(f"   💀 {produto['nome']} - venceu em {produto['data_validade']} | Estoque: {produto['quantidade']} unidades")
-    
-    confirmar = input("\n🗑️  Deseja remover TODOS os produtos vencidos? (s/n): ").lower()
-    
-    if confirmar == 's':
-        # Remove produtos vencidos da lista
-        global produtos
-        produtos = [p for p in produtos if p not in produtos_vencidos]
-        salvar_dados()
-        print(f"✅ {len(produtos_vencidos)} produtos vencidos removidos com sucesso!")
-    else:
-        print("❌ Operação cancelada.")
-    
-    pausar()
-
 def visualizar_estoque():
-    """VISUALIZAR ESTOQUE - Para administradores"""
+    """
+    VISUALIZAR ESTOQUE ATUAL - Mostra apenas produtos ATIVOS
+    """
     exibir_cabecalho("ESTOQUE ATUAL")
     
-    if not produtos:
+    # 🔍 FILTRO: Apenas produtos ATIVOS
+    produtos_ativos = [p for p in produtos if p['ativo'] == True]
+    
+    if not produtos_ativos:
         print("📭 Nenhum produto no estoque.")
         pausar()
         return
     
-    # Alertas
-    produtos_baixo_estoque = [p for p in produtos if p['quantidade'] <= p['quantidade_minima']]
-    produtos_proximos_vencer = verificar_produtos_proximos_vencimento()
-    produtos_vencidos = verificar_produtos_vencidos()  # NOVO: Verifica produtos vencidos
+    # 🚨 ALERTAS (apenas para produtos ATIVOS)
+    produtos_baixo_estoque = [p for p in produtos_ativos if p['quantidade'] <= p['quantidade_minima']]
+    produtos_proximos_vencer = [p for p in produtos_ativos if verificar_proximo_vencimento(p['data_validade'])]
+    produtos_vencidos_ativos = [p for p in produtos_ativos if verificar_se_vencido(p['data_validade'])]
     
-    # 🔴 ALERTA DE PRODUTOS VENCIDOS (NOVO)
-    if produtos_vencidos:
-        print("🚨 PRODUTOS VENCIDOS:")
-        for produto in produtos_vencidos:
+    # ⚠️ ALERTA DE PRODUTOS VENCIDOS AINDA ATIVOS
+    if produtos_vencidos_ativos:
+        print("🚨 PRODUTOS VENCIDOS NO ESTOQUE:")
+        for produto in produtos_vencidos_ativos:
             print(f"   💀 {produto['nome']} - venceu em {produto['data_validade']} | Estoque: {produto['quantidade']} unidades")
         print()
     
@@ -1637,21 +1226,17 @@ def visualizar_estoque():
             print(f"   ⏰ {produto['nome']} - vence em {produto['data_validade']}")
         print()
     
-    # Resto do código da função permanece igual...
+    # 📊 TABELA DE ESTOQUE ATIVO
     print(f"{'ID':<4} {'NOME':<20} {'CATEGORIA':<15} {'QUANTIDADE':<12} {'ESTOQUE':<10} {'VALIDADE':<12}")
     print("-" * 90)
     
-    for produto in produtos:
+    for produto in produtos_ativos:
+        # 🎭 DEFINE STATUS DO ESTOQUE
         estoque_status = "🟢 OK" if produto['quantidade'] > produto['quantidade_minima'] else "🔴 BAIXO"
         
-        # Verifica se o produto está vencido para destacar na tabela
-        try:
-            data_validade = datetime.datetime.strptime(produto['data_validade'], "%d/%m/%Y")
-            hoje = datetime.datetime.now()
-            if data_validade < hoje:
-                estoque_status = "💀 VENCIDO"  # Destaca produtos vencidos na tabela
-        except:
-            pass
+        # 🔍 VERIFICA SE ESTÁ VENCIDO (para destacar)
+        if verificar_se_vencido(produto['data_validade']):
+            estoque_status = "💀 VENCIDO"
             
         print(f"{produto['id']:<4} {produto['nome'][:18]:<20} {produto['categoria'][:13]:<15} "
               f"{produto['quantidade']:<12} {estoque_status:<10} {produto['data_validade']:<12}")
@@ -1977,6 +1562,561 @@ def menu_relatorios():
             pausar()
 
 # =============================================
+# FUNÇÕES PARA EDITAR PENDÊNCIAS
+# =============================================
+
+def editar_pendencia_doador(pendencia):
+    """
+    EDITAR PENDÊNCIA DE DOAÇÃO - Para doadores
+    Permite que o doador modifique os dados de uma doação pendente
+    """
+    exibir_cabecalho("EDITAR DOAÇÃO PENDENTE")
+    
+    print(f"📝 Editando Doação Pendente - ID: {pendencia['id']}")
+    print("-" * 50)
+    
+    # 🔍 EXIBIÇÃO DOS DADOS ATUAIS
+    print("📋 Dados atuais:")
+    print(f"📦 Nome do produto: {pendencia['produto_nome']}")
+    print(f"📄 Descrição: {pendencia.get('produto_descricao', 'Nenhuma')}")
+    print(f"🏷️  Categoria: {pendencia.get('produto_categoria', 'Nenhuma')}")
+    print(f"⚖️  Peso: {pendencia.get('produto_peso', 0)} kg")
+    print(f"📊 Quantidade: {pendencia['quantidade']}")
+    print(f"📅 Data de validade: {pendencia.get('produto_validade', 'Não informada')}")
+    print("-" * 50)
+    
+    # ✏️ COLETA DE NOVOS DADOS
+    print("📝 Digite os novos dados (deixe em branco para manter o valor atual):")
+    
+    novo_nome = input(f"📦 Novo nome do produto [{pendencia['produto_nome']}]: ").strip()
+    nova_descricao = input(f"📄 Nova descrição [{pendencia.get('produto_descricao', '')}]: ").strip()
+    nova_categoria = input(f"🏷️  Nova categoria [{pendencia.get('produto_categoria', '')}]: ").strip()
+    novo_peso = input(f"⚖️  Novo peso (kg) [{pendencia.get('produto_peso', 0)}]: ").strip()
+    nova_quantidade = input(f"📊 Nova quantidade [{pendencia['quantidade']}]: ").strip()
+    nova_validade = input(f"📅 Nova data de validade (DD/MM/AAAA) [{pendencia.get('produto_validade', '')}]: ").strip()
+    
+    # 🔄 APLICAÇÃO DAS ALTERAÇÕES
+    alteracoes = False
+    
+    if novo_nome and novo_nome != pendencia['produto_nome']:
+        pendencia['produto_nome'] = novo_nome
+        alteracoes = True
+        print("✅ Nome do produto atualizado!")
+    
+    if nova_descricao != pendencia.get('produto_descricao', ''):
+        pendencia['produto_descricao'] = nova_descricao
+        alteracoes = True
+        print("✅ Descrição atualizada!")
+    
+    if nova_categoria and nova_categoria != pendencia.get('produto_categoria', ''):
+        pendencia['produto_categoria'] = nova_categoria
+        alteracoes = True
+        print("✅ Categoria atualizada!")
+    
+    # 🎯 VALIDAÇÃO DE CAMPOS NUMÉRICOS
+    if novo_peso:
+        try:
+            novo_peso_float = float(novo_peso)
+            if novo_peso_float != pendencia.get('produto_peso', 0):
+                pendencia['produto_peso'] = novo_peso_float
+                alteracoes = True
+                print("✅ Peso atualizado!")
+        except ValueError:
+            print("❌ Peso inválido! Mantendo valor anterior.")
+    
+    if nova_quantidade:
+        try:
+            nova_quantidade_int = int(nova_quantidade)
+            if nova_quantidade_int != pendencia['quantidade']:
+                pendencia['quantidade'] = nova_quantidade_int
+                alteracoes = True
+                print("✅ Quantidade atualizada!")
+        except ValueError:
+            print("❌ Quantidade inválida! Mantendo valor anterior.")
+    
+    if nova_validade and nova_validade != pendencia.get('produto_validade', ''):
+        pendencia['produto_validade'] = nova_validade
+        alteracoes = True
+        print("✅ Data de validade atualizada!")
+    
+    # 💾 SALVAMENTO E REGISTRO DE MODIFICAÇÃO
+    if alteracoes:
+        pendencia['data_modificacao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        salvar_dados()
+        print(f"\n🎉 Doação atualizada com sucesso!")
+        print(f"📅 Última modificação: {pendencia['data_modificacao']}")
+    else:
+        print(f"\nℹ️  Nenhuma alteração foi realizada.")
+    
+    pausar()
+
+def editar_pendencia_solicitante(pendencia):
+    """
+    EDITAR PENDÊNCIA DE SOLICITAÇÃO - Para solicitantes
+    Permite que o solicitante altere a quantidade solicitada
+    """
+    exibir_cabecalho("EDITAR SOLICITAÇÃO PENDENTE")
+    
+    print(f"📝 Editando Solicitação Pendente - ID: {pendencia['id']}")
+    print("-" * 50)
+    
+    # 📊 CONTEXTUALIZAÇÃO COM DADOS ATUAIS
+    print("📋 Dados atuais:")
+    print(f"📦 Produto: {pendencia['produto_nome']}")
+    print(f"📊 Quantidade solicitada: {pendencia['quantidade']}")
+    print("-" * 50)
+    
+    # 🔍 VERIFICAÇÃO DE ESTOQUE
+    produto = next((p for p in produtos if p['id'] == pendencia['produto_id']), None)
+    if produto:
+        print(f"📦 Estoque disponível: {produto['quantidade']} unidades")
+        print("-" * 50)
+    
+    # ✏️ COLETA DA NOVA QUANTIDADE
+    print("📝 Digite os novos dados (deixe em branco para manter o valor atual):")
+    nova_quantidade = input(f"📊 Nova quantidade desejada [{pendencia['quantidade']}]: ").strip()
+    
+    # 🔄 PROCESSAMENTO DA ALTERAÇÃO
+    alteracoes = False
+    
+    if nova_quantidade:
+        try:
+            nova_quantidade_int = int(nova_quantidade)
+            
+            # 🚨 VALIDAÇÃO DE REGRA DE NEGÓCIO
+            if produto and nova_quantidade_int > produto['quantidade']:
+                print(f"❌ Quantidade solicitada ({nova_quantidade_int}) maior que estoque disponível ({produto['quantidade']})!")
+                pausar()
+                return
+            
+            # ✅ APLICA A ALTERAÇÃO SE VÁLIDA
+            if nova_quantidade_int != pendencia['quantidade']:
+                pendencia['quantidade'] = nova_quantidade_int
+                alteracoes = True
+                print("✅ Quantidade atualizada!")
+        except ValueError:
+            print("❌ Quantidade inválida! Mantendo valor anterior.")
+    
+    # 💾 SALVAMENTO COM REGISTRO
+    if alteracoes:
+        pendencia['data_modificacao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        salvar_dados()
+        print(f"\n🎉 Solicitação atualizada com sucesso!")
+        print(f"📅 Última modificação: {pendencia['data_modificacao']}")
+    else:
+        print(f"\nℹ️  Nenhuma alteração foi realizada.")
+    
+    pausar()
+
+def excluir_pendencia(pendencia):
+    """
+    "EXCLUIR" PENDÊNCIA - Soft Delete com experiência de exclusão
+    
+    O usuário acha que está excluindo permanentemente,
+    mas está apenas marcando como desativada (Soft Delete)
+    """
+    exibir_cabecalho("EXCLUIR PENDÊNCIA")
+    
+    print(f"🗑️  Excluindo Pendência - ID: {pendencia['id']}")
+    print("-" * 50)
+    
+    # Mostra o que será "excluído"
+    if pendencia['tipo'] == 'ENTRADA':
+        print(f"🎁 Doação: {pendencia['produto_nome']}")
+        print(f"📊 Quantidade: {pendencia['quantidade']}")
+    else:
+        print(f"📦 Solicitação: {pendencia['produto_nome']}")
+        print(f"📊 Quantidade: {pendencia['quantidade']}")
+    
+    print(f"📅 Data de solicitação: {pendencia['data_solicitacao']}")
+    print("-" * 50)
+    
+    # Confirmação dramática
+    print("\n⚠️  ATENÇÃO: Esta operação não pode ser desfeita!")
+    confirmar = input("\n❓ Confirmar exclusão? (digite 'CONFIRMAR'): ").strip()
+    
+    if confirmar.upper() == 'CONFIRMAR':
+        # 🔄 SOFT DELETE - apenas muda o status
+        pendencia['status'] = 'Desativada'
+        pendencia['data_exclusao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        pendencia['excluido_por'] = usuario_logado['nome']
+        
+        salvar_dados()
+        
+        # Feedback de "exclusão bem-sucedida"
+        print(f"\n✅ Pendência excluída com sucesso!")
+        print(f"📛 Registro removido do sistema")
+        print(f"⏰ Data da exclusão: {pendencia['data_exclusao']}")
+    else:
+        print(f"\n❌ Exclusão cancelada.")
+    
+    pausar()
+
+def recuperar_pendencias_excluidas():
+    """
+    RECUPERAR PENDÊNCIAS "EXCLUÍDAS" - Apenas para administradores
+    Esta função mostra a "parte oculta" do Soft Delete
+    Enquanto usuários comuns acham que excluíram, administradores podem ver tudo
+    """
+    exibir_cabecalho("PENDÊNCIAS EXCLUÍDAS - ÁREA ADMINISTRATIVA")
+    
+    # 🔍 BUSCA APENAS PENDÊNCIAS DESATIVADAS (as "excluídas")
+    pendencias_excluidas = [p for p in pendencias if p['status'] == 'Desativada']
+    
+    if not pendencias_excluidas:
+        print("📭 Nenhuma pendência excluída encontrada.")
+        pausar()
+        return
+    
+    print("🔍 PENDÊNCIAS EXCLUÍDAS DO SISTEMA:")
+    print("   (Esta área é restrita a administradores)")
+    print("-" * 100)
+    print(f"{'ID':<4} {'TIPO':<8} {'USUÁRIO':<20} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA EXCLUSÃO':<16}")
+    print("-" * 100)
+    
+    for pend in pendencias_excluidas:
+        tipo = "🎁 DOAÇÃO" if pend['tipo'] == 'ENTRADA' else "📦 SOLICITAÇÃO"
+        print(f"{pend['id']:<4} {tipo:<8} {pend['usuario_nome'][:18]:<20} {pend['produto_nome'][:18]:<20} "
+              f"{pend['quantidade']:<12} {pend.get('data_exclusao', 'N/A')[:16]:<16}")
+    
+    pausar()
+
+def gerenciar_minhas_pendencias_doador():
+    """
+    GERENCIA PENDÊNCIAS DO DOADOR - Editar/Excluir
+    """
+    exibir_cabecalho("GERENCIAR MINHAS DOAÇÕES")
+    
+    # 🔍 FILTRO: Apenas pendências ATIVAS do usuário
+    minhas_pendencias = [p for p in pendencias 
+                        if p['usuario_id'] == usuario_logado['id'] 
+                        and p['tipo'] == 'ENTRADA' 
+                        and p['status'] == 'Pendente']
+    
+    if not minhas_pendencias:
+        print("📭 Você não tem doações ativas para gerenciar.")
+        pausar()
+        return
+    
+    # 📋 LISTA APENAS PENDÊNCIAS ATIVAS
+    print("🎁 SUAS DOAÇÕES ATIVAS:")
+    print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16} {'MODIFICAÇÃO':<16}")
+    print("-" * 80)
+    
+    for pend in minhas_pendencias:
+        data_modificacao = pend.get('data_modificacao', 'Nunca')
+        print(f"{pend['id']:<4} {pend['produto_nome'][:18]:<20} "
+              f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16} {data_modificacao[:16]:<16}")
+    
+    try:
+        pendencia_id = int(input("\n📋 ID da pendência para gerenciar: "))
+        pendencia = next((p for p in minhas_pendencias if p['id'] == pendencia_id), None)
+        
+        if pendencia:
+            print(f"\n🎛️  Opções para Doação ID {pendencia_id}:")
+            print("1. ✏️  Editar Doação")
+            print("2. 🗑️  Excluir Doação")
+            print("3. 🔙 Voltar")
+            
+            opcao = input("\n📋 Escolha uma opção: ")
+            
+            if opcao == '1':
+                editar_pendencia_doador(pendencia)
+            elif opcao == '2':
+                excluir_pendencia(pendencia)
+            elif opcao == '3':
+                return
+            else:
+                print("❌ Opção inválida!")
+                pausar()
+        else:
+            print("❌ Pendência não encontrada ou não pertence a você!")
+            pausar()
+            
+    except ValueError:
+        print("❌ Por favor, digite um ID válido!")
+        pausar()
+
+def gerenciar_minhas_pendencias_solicitante():
+    """
+    GERENCIA PENDÊNCIAS DO SOLICITANTE - Editar/Excluir
+    """
+    exibir_cabecalho("GERENCIAR MINHAS SOLICITAÇÕES")
+    
+    # 🔍 FILTRO: Apenas pendências ATIVAS do usuário
+    minhas_pendencias = [p for p in pendencias 
+                        if p['usuario_id'] == usuario_logado['id'] 
+                        and p['tipo'] == 'SAIDA' 
+                        and p['status'] == 'Pendente']
+    
+    if not minhas_pendencias:
+        print("📭 Você não tem solicitações ativas para gerenciar.")
+        pausar()
+        return
+    
+    # 📋 LISTA APENAS SOLICITAÇÕES ATIVAS
+    print("📋 SUAS SOLICITAÇÕES ATIVAS:")
+    print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16} {'MODIFICAÇÃO':<16}")
+    print("-" * 80)
+    
+    for pend in minhas_pendencias:
+        data_modificacao = pend.get('data_modificacao', 'Nunca')
+        print(f"{pend['id']:<4} {pend['produto_nome'][:18]:<20} "
+              f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16} {data_modificacao[:16]:<16}")
+    
+    try:
+        pendencia_id = int(input("\n📋 ID da pendência para gerenciar: "))
+        pendencia = next((p for p in minhas_pendencias if p['id'] == pendencia_id), None)
+        
+        if pendencia:
+            print(f"\n🎛️  Opções para Solicitação ID {pendencia_id}:")
+            print("1. ✏️  Editar Solicitação")
+            print("2. 🗑️  Excluir Solicitação")
+            print("3. 🔙 Voltar")
+            
+            opcao = input("\n📋 Escolha uma opção: ")
+            
+            if opcao == '1':
+                editar_pendencia_solicitante(pendencia)
+            elif opcao == '2':
+                excluir_pendencia(pendencia)
+            elif opcao == '3':
+                return
+            else:
+                print("❌ Opção inválida!")
+                pausar()
+        else:
+            print("❌ Pendência não encontrada ou não pertence a você!")
+            pausar()
+            
+    except ValueError:
+        print("❌ Por favor, digite um ID válido!")
+        pausar()
+
+# =============================================
+# MÓDULO SOBRE VENCIMENTO
+# =============================================
+
+def verificar_produtos_proximos_vencimento():
+    """VERIFICA PRODUTOS PRÓXIMOS DO VENCIMENTO"""
+    produtos_proximos = []
+    hoje = datetime.datetime.now()
+    
+    for produto in produtos:
+        try:
+            #converte string para datetime e faz operações
+            data_validade = datetime.datetime.strptime(produto['data_validade'], "%d/%m/%Y")
+            dias_para_vencer = (data_validade - hoje).days
+            if 0 <= dias_para_vencer <= 30: #verifica produtos com vencimento em até 30 dias
+                produtos_proximos.append(produto)   #adiciona a lista a de "perto de vencer"
+        except: #Se houver erro na conversão da data, pula para o próximo produto
+            continue
+    
+    return produtos_proximos  #retorna lista de produtos perto do vencimento
+
+def verificar_produtos_vencidos():
+    """VERIFICA PRODUTOS JÁ VENCIDOS"""
+    produtos_vencidos = []
+    hoje = datetime.datetime.now()
+    
+    for produto in produtos:
+        try:
+            data_validade = datetime.datetime.strptime(produto['data_validade'], "%d/%m/%Y")
+            if data_validade < hoje:  # Produtos com data anterior à atual
+                produtos_vencidos.append(produto)
+        except:
+            continue
+    
+    return produtos_vencidos
+
+def verificar_se_vencido(data_validade):
+    """
+    VERIFICA SE PRODUTO ESTÁ VENCIDO - Função auxiliar
+    """
+    try:
+        # 📅 CONVERTE STRING PARA DATA
+        data_validade_obj = datetime.datetime.strptime(data_validade, "%d/%m/%Y")
+        hoje = datetime.datetime.now()
+        
+        # 🔍 COMPARA AS DATAS
+        return data_validade_obj < hoje  # True se vencido
+        
+    except ValueError:
+        # 🚨 SE HOUVER ERRO NA CONVERSÃO, CONSIDERA NÃO VENCIDO
+        return False
+
+def verificar_proximo_vencimento(data_validade):
+    """
+    VERIFICA SE PRODUTO ESTÁ PRÓXIMO DO VENCIMENTO - Função auxiliar
+    """
+    try:
+        data_validade_obj = datetime.datetime.strptime(data_validade, "%d/%m/%Y")
+        hoje = datetime.datetime.now()
+        dias_para_vencer = (data_validade_obj - hoje).days
+        
+        return 0 <= dias_para_vencer <= 30  # True se vencer em até 30 dias
+        
+    except ValueError:
+        return False
+
+def remover_produtos_vencidos():
+    """
+    "REMOVER" PRODUTOS VENCIDOS - Soft Delete para produtos vencidos
+    
+    🎯 CONCEITO: Preservação de Dados Históricos
+    - Mantemos registro de todos os produtos, mesmo os vencidos
+    - Podemos gerar relatórios de produtos descartados
+    - Temos controle de estoque histórico completo
+    """
+    exibir_cabecalho("REMOVER PRODUTOS VENCIDOS")
+    
+    # 🔍 IDENTIFICA PRODUTOS VENCIDOS (apenas os ATIVOS)
+    produtos_vencidos = [p for p in produtos 
+                        if p['ativo'] == True  # 👈 Apenas produtos ativos
+                        and verificar_se_vencido(p['data_validade'])]
+    
+    if not produtos_vencidos:
+        print("✅ Nenhum produto vencido encontrado!")
+        pausar()
+        return
+    
+    # 📊 EXIBE PRODUTOS VENCIDOS ENCONTRADOS
+    print(f"🚨 Encontrados {len(produtos_vencidos)} produtos vencidos:")
+    print("-" * 80)
+    print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'VALIDADE':<12} {'STATUS':<10}")
+    print("-" * 80)
+    
+    for produto in produtos_vencidos:
+        print(f"{produto['id']:<4} {produto['nome'][:18]:<20} "
+              f"{produto['quantidade']:<12} {produto['data_validade']:<12} 💀 VENCIDO")
+    
+    # ⚠️ CONFIRMAÇÃO DE "REMOÇÃO"
+    print(f"\n⚠️  ATENÇÃO: {len(produtos_vencidos)} produtos serão marcados como vencidos.")
+    print("   Eles não aparecerão mais no estoque ativo, mas ficarão no histórico.")
+    
+    confirmar = input("\n❓ Confirmar remoção? (digite 'CONFIRMAR'): ").strip()
+    
+    if confirmar.upper() == 'CONFIRMAR':
+        # 🔄 SOFT DELETE - Marca produtos como inativos
+        produtos_removidos = 0
+        for produto in produtos_vencidos:
+            produto['ativo'] = False  # 👈 Soft Delete - marca como inativo
+            produto['data_remocao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+            produto['removido_por'] = usuario_logado['nome']
+            produto['motivo_remocao'] = 'Vencimento'
+            produtos_removidos += 1
+        
+        salvar_dados()
+        
+        # ✅ FEEDBACK DE SUCESSO
+        print(f"\n✅ {produtos_removidos} produtos vencidos removidos com sucesso!")
+        print(f"📅 Data da remoção: {datetime.datetime.now().strftime('%d/%m/%Y %H:%M')}")
+        print(f"👤 Removido por: {usuario_logado['nome']}")
+        print(f"📊 Os produtos foram movidos para o histórico de vencidos.")
+        
+    else:
+        print(f"\n❌ Operação cancelada. Os produtos permanecem no estoque.")
+    
+    pausar()
+
+def gerar_relatorio_vencidos():
+    """
+    GERAR RELATÓRIO DE PRODUTOS VENCIDOS - Para administradores
+    
+    📈 Dados importantes para gestão:
+    - Volume de produtos perdidos
+    - Produtos com maior índice de vencimento
+    - Controle de custos
+    """
+    exibir_cabecalho("RELATÓRIO DE PRODUTOS VENCIDOS")
+    
+    # 🔍 PRODUTOS VENCIDOS (inativos)
+    produtos_vencidos = [p for p in produtos 
+                        if p['ativo'] == False 
+                        and p.get('motivo_remocao') == 'Vencimento']
+    
+    if not produtos_vencidos:
+        print("📭 Nenhum produto vencido no histórico.")
+        pausar()
+        return
+    
+    # 📊 ESTATÍSTICAS DETALHADAS
+    total_produtos = len(produtos_vencidos)
+    total_unidades = sum(p['quantidade'] for p in produtos_vencidos)
+    
+    # 🏷️ AGRUPAMENTO POR CATEGORIA
+    categorias = {}
+    for produto in produtos_vencidos:
+        cat = produto['categoria']
+        if cat in categorias:
+            categorias[cat] += produto['quantidade']
+        else:
+            categorias[cat] = produto['quantidade']
+    
+    print("📊 RELATÓRIO COMPLETO DE PRODUTOS VENCIDOS")
+    print("=" * 50)
+    print(f"📦 Total de produtos vencidos: {total_produtos}")
+    print(f"🔢 Total de unidades perdidas: {total_unidades}")
+    print(f"📅 Período: Todos os registros históricos")
+    print("=" * 50)
+    
+    # 📈 DISTRIBUIÇÃO POR CATEGORIA
+    if categorias:
+        print("\n🏷️  DISTRIBUIÇÃO POR CATEGORIA:")
+        for categoria, quantidade in categorias.items():
+            percentual = (quantidade / total_unidades) * 100
+            print(f"   📋 {categoria}: {quantidade} unidades ({percentual:.1f}%)")
+    
+    # 📋 DETALHES DOS PRODUTOS
+    print(f"\n📋 DETALHES DOS PRODUTOS VENCIDOS:")
+    print(f"{'PRODUTO':<20} {'CATEGORIA':<15} {'QUANTIDADE':<12} {'DATA VALIDADE':<14} {'DATA REMOÇÃO':<14}")
+    print("-" * 80)
+    
+    for produto in produtos_vencidos:
+        print(f"{produto['nome'][:18]:<20} {produto['categoria'][:13]:<15} "
+              f"{produto['quantidade']:<12} {produto['data_validade']:<14} {produto.get('data_remocao', 'N/A')[:14]:<14}")
+    
+    pausar()
+
+def visualizar_historico_vencidos():
+    """
+    VISUALIZAR HISTÓRICO DE PRODUTOS VENCIDOS - Para administradores
+    
+    📊 Benefícios do Soft Delete para produtos:
+    - Controle de perdas por vencimento
+    - Relatórios de gestão de estoque
+    - Rastreabilidade completa
+    """
+    exibir_cabecalho("HISTÓRICO DE PRODUTOS VENCIDOS")
+    
+    # 🔍 FILTRA PRODUTOS MARCADOS COMO INATIVOS POR VENCIMENTO
+    produtos_vencidos = [p for p in produtos 
+                        if p['ativo'] == False 
+                        and p.get('motivo_remocao') == 'Vencimento']
+    
+    if not produtos_vencidos:
+        print("📭 Nenhum produto vencido no histórico.")
+        pausar()
+        return
+    
+    # 📊 ESTATÍSTICAS
+    total_unidades = sum(p['quantidade'] for p in produtos_vencidos)
+    total_produtos = len(produtos_vencidos)
+    
+    print(f"📊 HISTÓRICO DE VENCIDOS - {total_produtos} produtos ({total_unidades} unidades)")
+    print("-" * 100)
+    print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'VALIDADE':<12} {'DATA REMOÇÃO':<16} {'REMOVIDO POR':<15}")
+    print("-" * 100)
+    
+    # 📋 LISTA PRODUTOS VENCIDOS
+    for produto in produtos_vencidos:
+        print(f"{produto['id']:<4} {produto['nome'][:18]:<20} "
+              f"{produto['quantidade']:<12} {produto['data_validade']:<12} "
+              f"{produto.get('data_remocao', 'N/A')[:16]:<16} {produto.get('removido_por', 'Sistema')[:13]:<15}")
+    
+    pausar()
+
+# =============================================
 # MENUS POR PERFIL
 # =============================================
 
@@ -2069,9 +2209,11 @@ def menu_administrador():
         print("3. 🗑️  Remover Produtos Vencidos")  
         print("4. 📊 Relatórios")
         print("5. 👥 Gerenciar Usuários")
-        print("6. 👤 Meu Perfil")
-        print("7. 🎭 Trocar de Usuario")    
-        print("8. 🚪 Sair")
+        print("6. 🔍 Ver Pendências Excluídas")
+        print("7. 💀 Histórico de Produtos Vencidos")
+        print("8. 👤 Meu Perfil")
+        print("9. 🎭 Trocar de Usuario")    
+        print("10. 🚪 Sair")
         
         opcao = input("\n📋 Escolha uma opção: ")
         
@@ -2086,11 +2228,15 @@ def menu_administrador():
         elif opcao == '5':
             menu_gerenciar_usuarios()
         elif opcao == '6':
-            menu_meu_perfil()
+            recuperar_pendencias_excluidas()
         elif opcao == '7':
+            visualizar_historico_vencidos()
+        elif opcao == '8':
+            menu_meu_perfil()
+        elif opcao == '9':
             if trocar_usuario():
                 return True
-        elif opcao == '8':
+        elif opcao == '10':
             limpar_tela()
             print("\n👋 Até logo!")
             return False            
