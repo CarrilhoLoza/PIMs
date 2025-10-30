@@ -774,25 +774,44 @@ def registrar_doacao_pendente():
     pausar()
 
 def minhas_doacoes_pendentes():
-    """MINHAS DOAÇÕES PENDENTES - Para doadores"""
+    """
+    MINHAS DOAÇÕES PENDENTES - Para doadores (apenas ATIVAS)
+    
+    Estudante: Esta função foi CORRIGIDA para mostrar APENAS pendências ATIVAS
+    As pendências "excluídas" (status 'Desativada') NÃO aparecem mais
+    
+    🔍 FILTRO IMPORTANTE: 
+    - usuario_id: Apenas do usuário logado
+    - tipo: Apenas ENTRADA (doações)
+    - status: Apenas 'Pendente' (ativas)
+    """
     exibir_cabecalho("MINHAS DOAÇÕES PENDENTES")
     
-    minhas_pendencias = [p for p in pendencias if p['usuario_id'] == usuario_logado['id'] and p['tipo'] == 'ENTRADA']
-    #                   Gera lista de Pendencias 👆👆
-    if not minhas_pendencias:# verifica se não existem pendencias
+    # 🔍 FILTRO CORRIGIDO: Apenas pendências ATIVAS do usuário
+    # Estudante: Note que adicionamos 'p['status'] == 'Pendente'' ao filtro
+    # Isso garante que apenas pendências ATIVAS serão mostradas
+    minhas_pendencias = [p for p in pendencias 
+                        if p['usuario_id'] == usuario_logado['id']  # 👈 Do usuário logado
+                        and p['tipo'] == 'ENTRADA'                   # 👈 Apenas doações
+                        and p['status'] == 'Pendente']               # 👈 APENAS ATIVAS!
+    
+    # 📭 VERIFICA SE NÃO HÁ PENDÊNCIAS
+    if not minhas_pendencias:
         print("📭 Você não tem doações pendentes.")
         pausar()
         return
     
-    #cabeçalho da tebela
+    # 📊 EXIBE A LISTA DE PENDÊNCIAS ATIVAS
     print(f"🎁 Suas Doações Pendentes ({len(minhas_pendencias)}):")
     print("-" * 80)
     print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16} {'STATUS':<12}")
     print("-" * 80)
     
-    for pend in minhas_pendencias:  #exibe todas as pendencias
+    # 📋 PERCORRE E EXIBE CADA PENDÊNCIA ATIVA
+    for pend in minhas_pendencias:
         print(f"{pend['id']:<4} {pend['produto_nome'][:18]:<20} "
               f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16} {pend['status']:<12}")
+    
     pausar()
 
 def meu_historico_doacoes():
@@ -898,46 +917,428 @@ def nova_solicitacao_pendente():
     pausar()
 
 def minhas_solicitacoes_pendentes():
-    """MINHAS SOLICITAÇÕES PENDENTES - Para solicitantes"""
+    """
+    MINHAS SOLICITAÇÕES PENDENTES - Para solicitantes (apenas ATIVAS)
+    
+    Estudante: Esta função foi CORRIGIDA com o mesmo princípio da anterior
+    Agora mostra APENAS solicitações ATIVAS, as "excluídas" desaparecem
+    
+    🎯 CONCEITO: Consistência de Filtros
+    - Mesma lógica para doações e solicitações
+    - Usuário só vê o que está realmente ativo
+    - Experiência limpa e intuitiva
+    """
     exibir_cabecalho("MINHAS SOLICITAÇÕES PENDENTES")
     
-    minhas_pendencias = [p for p in pendencias if p['usuario_id'] == usuario_logado['id'] and p['tipo'] == 'SAIDA']
-    #                   List comprehension para gerar lista de pendencias  👆👆
-    if not minhas_pendencias:   #verifica existencia de pendencias
+    # 🔍 FILTRO CORRIGIDO: Apenas pendências ATIVAS do usuário
+    # Estudante: Mesmo filtro, mas para SAIDA (solicitações) em vez de ENTRADA
+    minhas_pendencias = [p for p in pendencias 
+                        if p['usuario_id'] == usuario_logado['id']  # 👈 Do usuário logado
+                        and p['tipo'] == 'SAIDA'                    # 👈 Apenas solicitações
+                        and p['status'] == 'Pendente']              # 👈 APENAS ATIVAS!
+    
+    # 📭 VERIFICA SE NÃO HÁ PENDÊNCIAS
+    if not minhas_pendencias:
         print("📭 Você não tem solicitações pendentes.")
+        pausar()
         return
     
-    #exibe cabeçalho da tabela
+    # 📊 EXIBE A LISTA DE SOLICITAÇÕES ATIVAS
     print(f"📋 Suas Solicitações Pendentes ({len(minhas_pendencias)}):")
     print("-" * 80)
     print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16} {'STATUS':<12}")
     print("-" * 80)
     
-    for pend in minhas_pendencias:  #exibe todas as pendencias
+    # 📋 PERCORRE E EXIBE CADA SOLICITAÇÃO ATIVA
+    for pend in minhas_pendencias:
         print(f"{pend['id']:<4} {pend['produto_nome'][:18]:<20} "
               f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16} {pend['status']:<12}")
+    
     pausar()
+
+# =============================================
+# FUNÇÕES PARA EDITAR PENDÊNCIAS
+# =============================================
+
+def editar_pendencia_doador(pendencia):
+    """
+    EDITAR PENDÊNCIA DE DOAÇÃO - Para doadores
+    Permite que o doador modifique os dados de uma doação pendente
+    
+    Estudante: Esta função mostra como implementar um formulário de edição
+    com preservação de dados antigos e validações
+    """
+    exibir_cabecalho("EDITAR DOAÇÃO PENDENTE")
+    
+    print(f"📝 Editando Doação Pendente - ID: {pendencia['id']}")
+    print("-" * 50)
+    
+    # 🔍 EXIBIÇÃO DOS DADOS ATUAIS
+    print("📋 Dados atuais:")
+    print(f"📦 Nome do produto: {pendencia['produto_nome']}")
+    print(f"📄 Descrição: {pendencia.get('produto_descricao', 'Nenhuma')}")
+    print(f"🏷️  Categoria: {pendencia.get('produto_categoria', 'Nenhuma')}")
+    print(f"⚖️  Peso: {pendencia.get('produto_peso', 0)} kg")
+    print(f"📊 Quantidade: {pendencia['quantidade']}")
+    print(f"📅 Data de validade: {pendencia.get('produto_validade', 'Não informada')}")
+    print("-" * 50)
+    
+    # ✏️ COLETA DE NOVOS DADOS
+    print("📝 Digite os novos dados (deixe em branco para manter o valor atual):")
+    
+    novo_nome = input(f"📦 Novo nome do produto [{pendencia['produto_nome']}]: ").strip()
+    nova_descricao = input(f"📄 Nova descrição [{pendencia.get('produto_descricao', '')}]: ").strip()
+    nova_categoria = input(f"🏷️  Nova categoria [{pendencia.get('produto_categoria', '')}]: ").strip()
+    novo_peso = input(f"⚖️  Novo peso (kg) [{pendencia.get('produto_peso', 0)}]: ").strip()
+    nova_quantidade = input(f"📊 Nova quantidade [{pendencia['quantidade']}]: ").strip()
+    nova_validade = input(f"📅 Nova data de validade (DD/MM/AAAA) [{pendencia.get('produto_validade', '')}]: ").strip()
+    
+    # 🔄 APLICAÇÃO DAS ALTERAÇÕES
+    alteracoes = False
+    
+    if novo_nome and novo_nome != pendencia['produto_nome']:
+        pendencia['produto_nome'] = novo_nome
+        alteracoes = True
+        print("✅ Nome do produto atualizado!")
+    
+    if nova_descricao != pendencia.get('produto_descricao', ''):
+        pendencia['produto_descricao'] = nova_descricao
+        alteracoes = True
+        print("✅ Descrição atualizada!")
+    
+    if nova_categoria and nova_categoria != pendencia.get('produto_categoria', ''):
+        pendencia['produto_categoria'] = nova_categoria
+        alteracoes = True
+        print("✅ Categoria atualizada!")
+    
+    # 🎯 VALIDAÇÃO DE CAMPOS NUMÉRICOS
+    if novo_peso:
+        try:
+            novo_peso_float = float(novo_peso)
+            if novo_peso_float != pendencia.get('produto_peso', 0):
+                pendencia['produto_peso'] = novo_peso_float
+                alteracoes = True
+                print("✅ Peso atualizado!")
+        except ValueError:
+            print("❌ Peso inválido! Mantendo valor anterior.")
+    
+    if nova_quantidade:
+        try:
+            nova_quantidade_int = int(nova_quantidade)
+            if nova_quantidade_int != pendencia['quantidade']:
+                pendencia['quantidade'] = nova_quantidade_int
+                alteracoes = True
+                print("✅ Quantidade atualizada!")
+        except ValueError:
+            print("❌ Quantidade inválida! Mantendo valor anterior.")
+    
+    if nova_validade and nova_validade != pendencia.get('produto_validade', ''):
+        pendencia['produto_validade'] = nova_validade
+        alteracoes = True
+        print("✅ Data de validade atualizada!")
+    
+    # 💾 SALVAMENTO E REGISTRO DE MODIFICAÇÃO
+    if alteracoes:
+        pendencia['data_modificacao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        salvar_dados()
+        print(f"\n🎉 Doação atualizada com sucesso!")
+        print(f"📅 Última modificação: {pendencia['data_modificacao']}")
+    else:
+        print(f"\nℹ️  Nenhuma alteração foi realizada.")
+    
+    pausar()
+
+def editar_pendencia_solicitante(pendencia):
+    """
+    EDITAR PENDÊNCIA DE SOLICITAÇÃO - Para solicitantes
+    Permite que o solicitante altere a quantidade solicitada
+    
+    Estudante: Esta função é mais simples porque só permite alterar quantidade
+    Mostra como fazer validação baseada em regras de negócio (estoque disponível)
+    """
+    exibir_cabecalho("EDITAR SOLICITAÇÃO PENDENTE")
+    
+    print(f"📝 Editando Solicitação Pendente - ID: {pendencia['id']}")
+    print("-" * 50)
+    
+    # 📊 CONTEXTUALIZAÇÃO COM DADOS ATUAIS
+    print("📋 Dados atuais:")
+    print(f"📦 Produto: {pendencia['produto_nome']}")
+    print(f"📊 Quantidade solicitada: {pendencia['quantidade']}")
+    print("-" * 50)
+    
+    # 🔍 VERIFICAÇÃO DE ESTOQUE
+    produto = next((p for p in produtos if p['id'] == pendencia['produto_id']), None)
+    if produto:
+        print(f"📦 Estoque disponível: {produto['quantidade']} unidades")
+        print("-" * 50)
+    
+    # ✏️ COLETA DA NOVA QUANTIDADE
+    print("📝 Digite os novos dados (deixe em branco para manter o valor atual):")
+    nova_quantidade = input(f"📊 Nova quantidade desejada [{pendencia['quantidade']}]: ").strip()
+    
+    # 🔄 PROCESSAMENTO DA ALTERAÇÃO
+    alteracoes = False
+    
+    if nova_quantidade:
+        try:
+            nova_quantidade_int = int(nova_quantidade)
+            
+            # 🚨 VALIDAÇÃO DE REGRA DE NEGÓCIO
+            if produto and nova_quantidade_int > produto['quantidade']:
+                print(f"❌ Quantidade solicitada ({nova_quantidade_int}) maior que estoque disponível ({produto['quantidade']})!")
+                pausar()
+                return
+            
+            # ✅ APLICA A ALTERAÇÃO SE VÁLIDA
+            if nova_quantidade_int != pendencia['quantidade']:
+                pendencia['quantidade'] = nova_quantidade_int
+                alteracoes = True
+                print("✅ Quantidade atualizada!")
+        except ValueError:
+            print("❌ Quantidade inválida! Mantendo valor anterior.")
+    
+    # 💾 SALVAMENTO COM REGISTRO
+    if alteracoes:
+        pendencia['data_modificacao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        salvar_dados()
+        print(f"\n🎉 Solicitação atualizada com sucesso!")
+        print(f"📅 Última modificação: {pendencia['data_modificacao']}")
+    else:
+        print(f"\nℹ️  Nenhuma alteração foi realizada.")
+    
+    pausar()
+
+def excluir_pendencia(pendencia):
+    """
+    "EXCLUIR" PENDÊNCIA - Soft Delete com experiência de exclusão
+    
+    Estudante: O usuário acha que está excluindo permanentemente,
+    mas estamos apenas marcando como desativada (Soft Delete)
+    """
+    exibir_cabecalho("EXCLUIR PENDÊNCIA")
+    
+    print(f"🗑️  Excluindo Pendência - ID: {pendencia['id']}")
+    print("-" * 50)
+    
+    # Mostra o que será "excluído"
+    if pendencia['tipo'] == 'ENTRADA':
+        print(f"🎁 Doação: {pendencia['produto_nome']}")
+        print(f"📊 Quantidade: {pendencia['quantidade']}")
+    else:
+        print(f"📦 Solicitação: {pendencia['produto_nome']}")
+        print(f"📊 Quantidade: {pendencia['quantidade']}")
+    
+    print(f"📅 Data de solicitação: {pendencia['data_solicitacao']}")
+    print("-" * 50)
+    
+    # Confirmação dramática
+    print("\n⚠️  ATENÇÃO: Esta operação não pode ser desfeita!")
+    confirmar = input("\n❓ Confirmar exclusão? (digite 'CONFIRMAR'): ").strip()
+    
+    if confirmar.upper() == 'CONFIRMAR':
+        # 🔄 SOFT DELETE - apenas muda o status
+        pendencia['status'] = 'Desativada'
+        pendencia['data_exclusao'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+        pendencia['excluido_por'] = usuario_logado['nome']
+        
+        salvar_dados()
+        
+        # Feedback de "exclusão bem-sucedida"
+        print(f"\n✅ Pendência excluída com sucesso!")
+        print(f"📛 Registro removido do sistema")
+        print(f"⏰ Data da exclusão: {pendencia['data_exclusao']}")
+    else:
+        print(f"\n❌ Exclusão cancelada.")
+    
+    pausar()
+
+def recuperar_pendencias_excluidas():
+    """
+    RECUPERAR PENDÊNCIAS "EXCLUÍDAS" - Apenas para administradores
+    
+    Estudante: Esta função mostra a "parte oculta" do Soft Delete
+    Enquanto usuários comuns acham que excluíram, administradores podem ver tudo
+    """
+    exibir_cabecalho("PENDÊNCIAS EXCLUÍDAS - ÁREA ADMINISTRATIVA")
+    
+    # 🔍 BUSCA APENAS PENDÊNCIAS DESATIVADAS (as "excluídas")
+    pendencias_excluidas = [p for p in pendencias if p['status'] == 'Desativada']
+    
+    if not pendencias_excluidas:
+        print("📭 Nenhuma pendência excluída encontrada.")
+        pausar()
+        return
+    
+    print("🔍 PENDÊNCIAS EXCLUÍDAS DO SISTEMA:")
+    print("   (Esta área é restrita a administradores)")
+    print("-" * 100)
+    print(f"{'ID':<4} {'TIPO':<8} {'USUÁRIO':<20} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA EXCLUSÃO':<16}")
+    print("-" * 100)
+    
+    for pend in pendencias_excluidas:
+        tipo = "🎁 DOAÇÃO" if pend['tipo'] == 'ENTRADA' else "📦 SOLICITAÇÃO"
+        print(f"{pend['id']:<4} {tipo:<8} {pend['usuario_nome'][:18]:<20} {pend['produto_nome'][:18]:<20} "
+              f"{pend['quantidade']:<12} {pend.get('data_exclusao', 'N/A')[:16]:<16}")
+    
+    pausar()
+
+def gerenciar_minhas_pendencias_doador():
+    """
+    GERENCIA PENDÊNCIAS DO DOADOR - Editar/Excluir
+    
+    Estudante: Interface simplificada onde usuário só vê pendências ativas
+    e tem opção de Editar ou "Excluir" (Soft Delete)
+    """
+    exibir_cabecalho("GERENCIAR MINHAS DOAÇÕES")
+    
+    # 🔍 FILTRO: Apenas pendências ATIVAS do usuário
+    minhas_pendencias = [p for p in pendencias 
+                        if p['usuario_id'] == usuario_logado['id'] 
+                        and p['tipo'] == 'ENTRADA' 
+                        and p['status'] == 'Pendente']
+    
+    if not minhas_pendencias:
+        print("📭 Você não tem doações ativas para gerenciar.")
+        pausar()
+        return
+    
+    # 📋 LISTA APENAS PENDÊNCIAS ATIVAS
+    print("🎁 SUAS DOAÇÕES ATIVAS:")
+    print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16} {'MODIFICAÇÃO':<16}")
+    print("-" * 80)
+    
+    for pend in minhas_pendencias:
+        data_modificacao = pend.get('data_modificacao', 'Nunca')
+        print(f"{pend['id']:<4} {pend['produto_nome'][:18]:<20} "
+              f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16} {data_modificacao[:16]:<16}")
+    
+    try:
+        pendencia_id = int(input("\n📋 ID da pendência para gerenciar: "))
+        pendencia = next((p for p in minhas_pendencias if p['id'] == pendencia_id), None)
+        
+        if pendencia:
+            print(f"\n🎛️  Opções para Doação ID {pendencia_id}:")
+            print("1. ✏️  Editar Doação")
+            print("2. 🗑️  Excluir Doação")
+            print("3. 🔙 Voltar")
+            
+            opcao = input("\n📋 Escolha uma opção: ")
+            
+            if opcao == '1':
+                editar_pendencia_doador(pendencia)
+            elif opcao == '2':
+                excluir_pendencia(pendencia)
+            elif opcao == '3':
+                return
+            else:
+                print("❌ Opção inválida!")
+                pausar()
+        else:
+            print("❌ Pendência não encontrada ou não pertence a você!")
+            pausar()
+            
+    except ValueError:
+        print("❌ Por favor, digite um ID válido!")
+        pausar()
+
+def gerenciar_minhas_pendencias_solicitante():
+    """
+    GERENCIA PENDÊNCIAS DO SOLICITANTE - Editar/Excluir
+    
+    Estudante: Mesma estrutura do doador, mas para solicitações
+    Mantém consistência na experiência do usuário
+    """
+    exibir_cabecalho("GERENCIAR MINHAS SOLICITAÇÕES")
+    
+    # 🔍 FILTRO: Apenas pendências ATIVAS do usuário
+    minhas_pendencias = [p for p in pendencias 
+                        if p['usuario_id'] == usuario_logado['id'] 
+                        and p['tipo'] == 'SAIDA' 
+                        and p['status'] == 'Pendente']
+    
+    if not minhas_pendencias:
+        print("📭 Você não tem solicitações ativas para gerenciar.")
+        pausar()
+        return
+    
+    # 📋 LISTA APENAS SOLICITAÇÕES ATIVAS
+    print("📋 SUAS SOLICITAÇÕES ATIVAS:")
+    print(f"{'ID':<4} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16} {'MODIFICAÇÃO':<16}")
+    print("-" * 80)
+    
+    for pend in minhas_pendencias:
+        data_modificacao = pend.get('data_modificacao', 'Nunca')
+        print(f"{pend['id']:<4} {pend['produto_nome'][:18]:<20} "
+              f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16} {data_modificacao[:16]:<16}")
+    
+    try:
+        pendencia_id = int(input("\n📋 ID da pendência para gerenciar: "))
+        pendencia = next((p for p in minhas_pendencias if p['id'] == pendencia_id), None)
+        
+        if pendencia:
+            print(f"\n🎛️  Opções para Solicitação ID {pendencia_id}:")
+            print("1. ✏️  Editar Solicitação")
+            print("2. 🗑️  Excluir Solicitação")
+            print("3. 🔙 Voltar")
+            
+            opcao = input("\n📋 Escolha uma opção: ")
+            
+            if opcao == '1':
+                editar_pendencia_solicitante(pendencia)
+            elif opcao == '2':
+                excluir_pendencia(pendencia)
+            elif opcao == '3':
+                return
+            else:
+                print("❌ Opção inválida!")
+                pausar()
+        else:
+            print("❌ Pendência não encontrada ou não pertence a você!")
+            pausar()
+            
+    except ValueError:
+        print("❌ Por favor, digite um ID válido!")
+        pausar()
 
 # =============================================
 # MÓDULO PARA ADMINISTRADORES
 # =============================================
 
 def listar_todas_pendencias():
-    """LISTA TODAS AS PENDÊNCIAS - Para administradores"""
+    """
+    LISTA TODAS AS PENDÊNCIAS - Para administradores (apenas ATIVAS)
+    
+    Estudante: Esta função também foi CORRIGIDA para mostrar apenas ATIVAS
+    O administrador só precisa ver pendências que precisam de ação
+    
+    🎯 CONCEITO: Foco na Ação
+    - Admin só vê pendências que precisam ser aprovadas/reprovadas
+    - Pendências "excluídas" não aparecem (já foram resolvidas pelo usuário)
+    - Interface mais limpa e eficiente
+    """
     exibir_cabecalho("TODAS AS PENDÊNCIAS")
-    #List comprehension para gerar lista de pendencias a serem avaliadas 
+    
+    # 🔍 FILTRO CORRIGIDO: Apenas pendências ATIVAS
+    # Estudante: Admin também só vê as ATIVAS para aprovação
     pendencias_pendentes = [p for p in pendencias if p['status'] == 'Pendente']
     
-    if not pendencias_pendentes:    #verifica se não existe pendencia
-        print("✅ Nenhuma pendência no momento.")
+    # 📭 VERIFICA SE NÃO HÁ PENDÊNCIAS ATIVAS
+    if not pendencias_pendentes:
+        print("✅ Nenhuma pendência ativa no momento.")
+        pausar()
         return
     
-    #cabeçalho da tabela
+    # 📊 EXIBE A LISTA DE PENDÊNCIAS ATIVAS
     print(f"{'ID':<4} {'TIPO':<8} {'USUÁRIO':<20} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16}")
     print("-" * 90)
     
-    for pend in pendencias_pendentes:   #Exibe tabela de pendencias a ser avaliadas
+    # 📋 PERCORRE E EXIBE CADA PENDÊNCIA ATIVA
+    for pend in pendencias_pendentes:
+        # 🎭 DEFINE EMOJI E TEXTO PARA O TIPO
         tipo = "🎁 ENTRADA" if pend['tipo'] == 'ENTRADA' else "📦 SAÍDA"
+        
+        # 🖨️ EXIBE A LINHA DA PENDÊNCIA
         print(f"{pend['id']:<4} {tipo:<8} {pend['usuario_nome'][:18]:<20} {pend['produto_nome'][:18]:<20} "
               f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16}")
 
@@ -1053,35 +1454,52 @@ def processar_aprovacao(pendencia):
         aprovar_saida(pendencia)
 
 def aprovar_reprovar_pendencias():
-    """APROVA/REPROVA PENDÊNCIAS - Função principal dos administradores"""
+    """
+    APROVAR/REPROVAR PENDÊNCIAS - Função principal dos administradores
+    
+    Estudante: Esta função foi CORRIGIDA para trabalhar apenas com pendências ATIVAS
+    O admin não pode aprovar/reprovar pendências que já foram "excluídas"
+    
+    🔧 FLUXO CORRIGIDO:
+    1. Mostra apenas pendências ATIVAS
+    2. Permite aprovar/reprovar apenas ATIVAS
+    3. Busca por ID apenas entre as ATIVAS
+    """
     exibir_cabecalho("APROVAR/REPROVAR PENDÊNCIAS")
     
+    # 🔍 FILTRO CORRIGIDO: Apenas pendências ATIVAS
     pendencias_pendentes = [p for p in pendencias if p['status'] == 'Pendente']
-    #       List comprehension para gerar pendencias a ser  avaliadas👆👆
-    if not pendencias_pendentes:    #Verifica se não tem  pendencias
+    
+    # 📭 VERIFICA SE NÃO HÁ PENDÊNCIAS PARA APROVAR
+    if not pendencias_pendentes:
         print("✅ Nenhuma pendência para aprovar no momento.")
         pausar()
         return
     
-    #cabeçalho da tabela
+    # 📊 EXIBE A LISTA DE PENDÊNCIAS PARA APROVAÇÃO
     print("📋 Pendências Pendentes:")
     print("-" * 90)
     print(f"{'ID':<4} {'TIPO':<8} {'USUÁRIO':<20} {'PRODUTO':<20} {'QUANTIDADE':<12} {'DATA':<16}")
     print("-" * 90)
 
-    # Lista pendências
+    # 📋 LISTA PENDÊNCIAS ATIVAS (apenas as que podem ser aprovadas)
     for pend in pendencias_pendentes:
         tipo = "🎁 ENTRADA" if pend['tipo'] == 'ENTRADA' else "📦 SAÍDA"
         print(f"{pend['id']:<4} {tipo:<8} {pend['usuario_nome'][:18]:<20} {pend['produto_nome'][:18]:<20} "
               f"{pend['quantidade']:<12} {pend['data_solicitacao']:<16}")
     
-    try:    #tenta pegar informações,se não conseguir exibe erro
+    try:
+        # 🎯 CAPTURA O ID DA PENDÊNCIA PARA PROCESSAR
         pendencia_id = int(input("\n📋 ID da pendência a aprovar/reprovar: "))
         acao = input("✅ Aprovar (a) ou ❌ Reprovar (r)? ").lower()
         
+        # 🔍 BUSCA A PENDÊNCIA APENAS ENTRE AS ATIVAS
+        # Estudante: Note que buscamos apenas entre pendências com status 'Pendente'
+        # Isso evita que admin tente processar pendências "excluídas"
         pendencia = next((p for p in pendencias if p['id'] == pendencia_id and p['status'] == 'Pendente'), None)
-        #           Procura pendecia pelo ID 👆👆
-        if pendencia:   #se encontrar pendencia
+        
+        if pendencia:
+            # 🎪 EXECUTA A AÇÃO SOLICITADA
             if acao == 'a':
                 processar_aprovacao(pendencia)
             elif acao == 'r':
@@ -1089,11 +1507,12 @@ def aprovar_reprovar_pendencias():
             else:
                 print("❌ Ação inválida!")
                 pausar()
-        else:       #se não encontrar pendencia
+        else:
             print("❌ Pendência não encontrada ou já processada!")
             pausar()
             
     except ValueError:
+        # 🚨 TRATAMENTO DE ERRO PARA ENTRADA INVÁLIDA
         print("❌ Por favor, digite um ID válido!")
         pausar()
 
@@ -1570,10 +1989,11 @@ def menu_doador():
         #menu simples para escolha
         print("1. 🎁 Registrar Nova Doação")
         print("2. 📦 Minhas Doações Pendentes")
-        print("3. 📊 Meu Histórico de Doações")
-        print("4. 👤 Meu Perfil")
-        print("5. 🎭 Trocar de Usuario")
-        print("6. 🚪 Sair")
+        print("3. 🛠️  Gerenciar Minhas Doações")
+        print("4. 📊 Meu Histórico de Doações")
+        print("5. 👤 Meu Perfil")
+        print("6. 🎭 Trocar de Usuario")
+        print("7. 🚪 Sair")
         
 
         opcao = input("\n📋 Escolha uma opção: ")
@@ -1582,14 +2002,16 @@ def menu_doador():
             registrar_doacao_pendente()
         elif opcao == '2':
             minhas_doacoes_pendentes()
-        elif opcao == '3':
-            meu_historico_doacoes()
+        elif opcao == '3':  
+            gerenciar_minhas_pendencias_doador()
         elif opcao == '4':
-            menu_meu_perfil()
+            meu_historico_doacoes()
         elif opcao == '5':
+            menu_meu_perfil()
+        elif opcao == '6':
             if trocar_usuario():
                 return True
-        elif opcao == '6':
+        elif opcao == '7':
             limpar_tela()
             print("\n👋 Até logo!")
             return False
@@ -1607,9 +2029,10 @@ def menu_solicitante():
         print("1. 📦 Visualizar Produtos Disponíveis")
         print("2. 📋 Nova Solicitação")
         print("3. 📊 Minhas Solicitações Pendentes")
-        print("4. 👤 Meu Perfil")
-        print("5. 🎭 Trocar de Usuario")
-        print("6. 🚪 Sair")
+        print("4. 🛠️  Gerenciar Minhas Solicitações")  
+        print("5. 👤 Meu Perfil")
+        print("6. 🎭 Trocar de Usuario")
+        print("7. 🚪 Sair")
         
         opcao = input("\n📋 Escolha uma opção: ")
         
@@ -1620,11 +2043,13 @@ def menu_solicitante():
         elif opcao == '3':
             minhas_solicitacoes_pendentes()
         elif opcao == '4':
-            menu_meu_perfil()
+            gerenciar_minhas_pendencias_solicitante()
         elif opcao == '5':
+            menu_meu_perfil()
+        elif opcao == '6':
             if trocar_usuario():
                 return True
-        elif opcao == '6':
+        elif opcao == '7':
             limpar_tela()
             print("\n👋 Até logo!")
             return False
