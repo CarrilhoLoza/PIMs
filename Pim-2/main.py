@@ -1553,6 +1553,97 @@ def gerar_relatorio_pendencias():
             print(f"❌ Erro ao processar filtro: {e}")
             pausar()
 
+def gerar_relatorio_ranking_solicitacoes():
+    """GERA RELATÓRIO DE RANKING DOS PRODUTOS MAIS SOLICITADOS - Apenas para administradores"""
+    exibir_cabecalho("RANKING - PRODUTOS MAIS SOLICITADOS")
+    
+    # Verifica se existem movimentações de saída (solicitações aprovadas)
+    solicitacoes_aprovadas = [m for m in movimentacoes if m['tipo'] == 'SAIDA']
+    
+    if not solicitacoes_aprovadas:
+        print("📭 Nenhuma solicitação aprovada encontrada no sistema.")
+        pausar()
+        return
+    
+    # Dicionário para armazenar estatísticas por produto
+    ranking_produtos = {}
+    
+    # Processa todas as solicitações aprovadas
+    for solicitacao in solicitacoes_aprovadas:
+        produto_id = solicitacao['produto_id']
+        produto_nome = solicitacao['produto_nome']
+        quantidade = solicitacao['quantidade']
+        
+        if produto_id in ranking_produtos:
+            # Atualiza produto existente
+            ranking_produtos[produto_id]['total_solicitado'] += quantidade
+            ranking_produtos[produto_id]['quantidade_solicitacoes'] += 1
+        else:
+            # Adiciona novo produto ao ranking
+            ranking_produtos[produto_id] = {
+                'nome': produto_nome,
+                'total_solicitado': quantidade,
+                'quantidade_solicitacoes': 1
+            }
+    
+    # Converte o dicionário para lista e ordena por total solicitado (decrescente)
+    ranking_lista = list(ranking_produtos.values())
+    ranking_lista.sort(key=lambda x: x['total_solicitado'], reverse=True)
+    
+    # Exibe o ranking
+    print("-" * 80)
+    print("🏆 RANKING DOS PRODUTOS MAIS SOLICITADOS:")
+    print(f"{'POS':<4} {'PRODUTO':<30} {'TOTAL SOLICITADO':<16} {'QTD SOLICITAÇÕES':<18} {'MÉDIA POR PEDIDO':<16}")
+    print("-" * 90)
+    
+    for i, produto in enumerate(ranking_lista[:15], 1):  # Top 15 produtos
+        # Calcula a média por solicitação
+        media_por_pedido = produto['total_solicitado'] / produto['quantidade_solicitacoes']
+        
+        # Define emoji para as primeiras posições
+        if i == 1:
+            posicao_emoji = "🥇"
+        elif i == 2:
+            posicao_emoji = "🥈" 
+        elif i == 3:
+            posicao_emoji = "🥉"
+        else:
+            posicao_emoji = f"{i}."
+        
+        print(f"{posicao_emoji:<4} {produto['nome'][:28]:<30} "
+              f"{produto['total_solicitado']:<16} {produto['quantidade_solicitacoes']:<18} "
+              f"{media_por_pedido:.1f}")
+    
+    # Se houver mais de 15 produtos, mostra quantos ficaram de fora
+    if len(ranking_lista) > 15:
+        print(f"\n📋 ... e mais {len(ranking_lista) - 15} produtos no ranking completo")
+    
+    # Análise adicional - produtos com maior frequência de solicitação
+    print(f"\n📈 ANÁLISE ADICIONAL:")
+    
+    # Produto com maior quantidade total solicitada
+    if ranking_lista:
+        produto_mais_solicitado = ranking_lista[0]
+        print(f"   🏅 Produto mais solicitado: {produto_mais_solicitado['nome']}")
+        print(f"      Total: {produto_mais_solicitado['total_solicitado']} unidades")
+    
+    # Produto com maior média por pedido
+    ranking_media = sorted(ranking_lista, key=lambda x: x['total_solicitado'] / x['quantidade_solicitacoes'], reverse=True)
+    if ranking_media:
+        produto_maior_media = ranking_media[0]
+        media = produto_maior_media['total_solicitado'] / produto_maior_media['quantidade_solicitacoes']
+        print(f"   📊 Produto com maior média por pedido: {produto_maior_media['nome']}")
+        print(f"      Média: {media:.1f} unidades por solicitação")
+    
+    # Produto mais frequente (mais solicitações)
+    ranking_frequencia = sorted(ranking_lista, key=lambda x: x['quantidade_solicitacoes'], reverse=True)
+    if ranking_frequencia:
+        produto_mais_frequente = ranking_frequencia[0]
+        print(f"   🔄 Produto mais frequente: {produto_mais_frequente['nome']}")
+        print(f"      {produto_mais_frequente['quantidade_solicitacoes']} solicitações")
+    
+    pausar()
+
 def menu_relatorios():
     """MENU DE RELATÓRIOS EM PYTHON"""
     while True:
@@ -1561,7 +1652,8 @@ def menu_relatorios():
         print("1. 📊 Relatório de Estoque")
         print("2. 📈 Relatório de Movimentações")
         print("3. 📋 Relatório de Pendências")
-        print("4. 🏠 Voltar")
+        print("4. 🏆 Ranking de Produtos Mais Solicitados")
+        print("5. 🏠 Voltar")
         
         opcao = input("\n📋 Escolha uma opção: ")
         
@@ -1571,7 +1663,9 @@ def menu_relatorios():
             gerar_relatorio_movimentacoes()
         elif opcao == '3':
             gerar_relatorio_pendencias()
-        elif opcao == '4':
+        elif opcao == '4': 
+            gerar_relatorio_ranking_solicitacoes()
+        elif opcao == '5':
             break
         else:
             print("❌ Opção inválida!")
