@@ -15,7 +15,6 @@ import subprocess
 
 usuarios = []          # Todos os usuários do sistema
 produtos = []          # Produtos em estoque
-solicitacoes = []      # Solicitações de produtos (saídas)
 movimentacoes = []     # Histórico de entradas/saídas APROVADAS
 pendencias = []        # Movimentações pendentes de aprovação
 
@@ -27,7 +26,7 @@ usuario_logado = None  # Usuário atualmente logado
 
 def inicializar_dados():
     """INICIALIZA DADOS DO SISTEMA"""
-    global usuarios, produtos, solicitacoes, movimentacoes, pendencias  #atribui a variaveis globais
+    global usuarios, produtos, movimentacoes, pendencias  #atribui a variaveis globais
     
     dados_iniciais = {                          #dados inicias ao rodar pela primeira vez
         'usuarios.json': [
@@ -43,7 +42,6 @@ def inicializar_dados():
             }
         ],
         'produtos.json': [],
-        'solicitacoes.json': [],
         'movimentacoes.json': [],
         'pendencias.json': []
     }
@@ -58,9 +56,9 @@ def inicializar_dados():
 
 def carregar_dados():
     """CARREGA DADOS DOS ARQUIVOS JSON"""
-    global usuarios, produtos, solicitacoes, movimentacoes, pendencias
+    global usuarios, produtos, movimentacoes, pendencias
     
-    arquivos = ['usuarios.json', 'produtos.json', 'solicitacoes.json', 'movimentacoes.json', 'pendencias.json']
+    arquivos = ['usuarios.json', 'produtos.json', 'movimentacoes.json', 'pendencias.json']
 #                                             lista dos arquivos json 👆👆👆
     for arquivo in arquivos:    #para cada arquivo
         if os.path.exists(arquivo):     #se arquivo existir
@@ -69,8 +67,6 @@ def carregar_dados():
                     usuarios = json.load(f)             #carrega json para lista tal para utilizar no sistema
                 elif arquivo == 'produtos.json':           #mesma logica nos "elif's"
                     produtos = json.load(f)
-                elif arquivo == 'solicitacoes.json':
-                    solicitacoes = json.load(f)
                 elif arquivo == 'movimentacoes.json':
                     movimentacoes = json.load(f)
                 elif arquivo == 'pendencias.json':
@@ -81,7 +77,6 @@ def salvar_dados():
     arquivos = {                #dicionario = lista nome json:nome listas correspodentes
         'usuarios.json': usuarios,
         'produtos.json': produtos,
-        'solicitacoes.json': solicitacoes,
         'movimentacoes.json': movimentacoes,
         'pendencias.json': pendencias
     }
