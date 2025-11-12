@@ -36,7 +36,7 @@ def inicializar_dados():
                 'email': 'admin@sistema.com',
                 'senha': '123456',
                 'perfil': 'Administrador',
-                'cpf': '12345678901',
+                'cpf': '123.456.789-01',
                 'telefone': '(11) 99999-0001',
                 'data_cadastro': '01/01/2024 00:00'
             }
