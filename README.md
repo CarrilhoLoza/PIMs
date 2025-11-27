@@ -3,4 +3,5 @@
 
 ## projetos:
  - Pim1 -> Concluido ✅
- - Pim2 -> Em processo ⏳
+ - Pim2 -> Concluido ✅
+ - Pim3 -> Em Processo ⏳
